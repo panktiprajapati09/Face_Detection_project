@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+/* ---------- PAGE BACKGROUND ---------- */
+body {
+    background: #f5f7ff !important; 
+    font-family: "Poppins", sans-serif;
+}
+
+/* Center the card nicely */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh;
+    padding-top: 20px;
+}
+
+/* ---------- LOGIN CARD (NEUMORPHIC + GLASS) ---------- */
+.card {
+    width: 420px;
+    padding: 2.8rem 2.5rem;
+    background: #ffffff;
+    border-radius: 25px;
+    box-shadow: 
+        10px 10px 35px rgba(0,0,0,0.08),
+        -5px -5px 25px rgba(255,255,255,1);
+    animation: softFade 0.7s ease-out;
+    text-align: center;
+}
+
+@keyframes softFade {
+    from { opacity: 0; transform: translateY(35px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- LOGIN HEADER ---------- */
+.login-header {
+    text-align: center;
+    margin-bottom: 20px;
+    animation: fadeIn 0.8s ease;
+}
+
+.login-icon {
+    font-size: 45px;
+    color:#3a0ca3;       /* Perfect purple */
+    margin-bottom: 8px;
+}
+
+.login-title {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color:#3a0ca3;       /* Perfect purple */
+    text-transform: lowercase;
+}
+
+/* ---------- CARD TEXT ---------- */
+.card h2 {
+    font-size: 1.9rem;
+    color: #2c2c2c;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.card p {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 1.6rem;
+}
+
+/* ---------- FORM INPUTS ---------- */
+.form-group {
+    margin-bottom: 1.3rem;
+}
+
+.form-label {
+    text-align: left;
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #444;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1.5px solid #e6e9ff;
+    background: #f0f4ff;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.2s;
+}
+
+.form-input:focus {
+    border-color: #3a0ca3;
+    background: #eef3ff;
+    box-shadow: 0 0 0 4px rgba(89,131,255,0.18);
+}
+
+/* ---------- BUTTON ---------- */
+.btn-primary {
+    width: 100%;
+    padding: 13px;
+    color: white;
+    background: linear-gradient(90deg, #3a0ca3);
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 14px rgba(0, 80, 255, 0.4);
+}
+
+.btn-primary:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 18px rgba(0, 80, 255, 0.55);
+}
+
+/* ---------- FLASH MESSAGES ---------- */
+.alert {
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+.alert-danger { background: #ff4f4f; color: white; }
+.alert-success { background: #28a745; color: white; }
+
+/* ---------- LINKS ---------- */
+.login-links {
+    margin-top: 1.3rem;
+}
+
+.login-links a {
+    color: #3a0ca3;
+    margin: 0 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: 0.3s;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+</style>
+
+
+
+<div class="login-wrapper">
+    <div class="card">
+
+        <!-- LOGO + TITLE -->
+        <div class="login-header">
+            <i class="fas fa-user-shield login-icon"></i>
+            <h1 class="login-title">face attendance</h1>
+        </div>
+
+        <h2>Faculty Login</h2>
+        <p>Access your dashboard to manage lectures and attendance records.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('faculty_login') }}" method="POST" autocomplete="off">
+    <div class="form-group">
+        <label class="form-label">Faculty ID</label>
+        <input type="text" name="faculty_id" class="form-input"
+                placeholder="e.g., F1, F2" required autocomplete="off">
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-input"
+                placeholder="Enter password" required autocomplete="new-password">
+    </div>
+
+    <button type="submit" class="btn-primary">Login</button>
+</form>
+
+        <div class="login-links">
+            <a href="{{ url_for('forgot_password') }}">Forgot Password?</a>
+            <a href="{{ url_for('index') }}">Return to Home</a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

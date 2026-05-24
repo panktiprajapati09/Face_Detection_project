@@ -1,0 +1,873 @@
+<!-- templates/admin_access_logs.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Logs - FACEATTEND</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --secondary: #4cc9f0;
+            --success: #4bb543;
+            --warning: #ffcc00;
+            --danger: #dc3545;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-left h1 {
+            color: var(--primary-dark);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-left p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #3a9c35;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 35px 10px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid #e9ecef;
+            font-size: 14px;
+        }
+
+        .table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f1f3f4;
+            font-size: 14px;
+        }
+
+        .table tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-success {
+            background: rgba(75, 181, 67, 0.1);
+            color: var(--success);
+        }
+
+        .status-warning {
+            background: rgba(255, 204, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .status-danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+
+        .status-info {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin: 0 auto 10px;
+        }
+
+        .stat-success { background: rgba(75, 181, 67, 0.1); color: var(--success); }
+        .stat-warning { background: rgba(255, 204, 0, 0.1); color: var(--warning); }
+        .stat-danger { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+        .stat-info { background: rgba(67, 97, 238, 0.1); color: var(--primary); }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .notification-success { background: var(--success); }
+        .notification-error { background: var(--danger); }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .filter-select {
+                min-width: 100%;
+            }
+        }
+        .btn-secondary {
+    background: var(--primary); /* Primary blue */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background: #228ee1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(108, 117, 125, 0.2);
+}
+
+/* If you want a different color scheme for the back button specifically */
+.btn-back {
+    background: #6c757d; /* Gray */
+    color: white;
+}
+
+.btn-back:hover {
+    background: #5a6268; /* Darker gray */
+}
+
+/* Or if you want it to match your primary theme */
+.btn-back-primary {
+    background: var(--primary-light);
+    color: white;
+}
+
+.btn-back-primary:hover {
+    background: var(--primary);
+}
+
+/* For a subtle outline style */
+.btn-outline-back {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.btn-outline-back:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .btn-secondary {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+    
+    /* Make button full width on mobile if needed */
+    .btn-secondary.mobile-full {
+        width: 100%;
+        justify-content: center;
+    }
+}
+/* If you want the back button to have a distinct style */
+.back-dashboard-btn {
+    background: linear-gradient(135deg, #e188c9 0%, #6d9fc4 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: var(--transition);
+    box-shadow: 0 3px 10px rgba(108, 117, 125, 0.2);
+}
+
+.back-dashboard-btn:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+    color: white;
+}
+
+.back-dashboard-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(108, 117, 125, 0.2);
+}
+
+/* Icon animation for back button */
+.back-dashboard-btn i {
+    transition: transform 0.3s ease;
+}
+
+.back-dashboard-btn:hover i {
+    transform: translateX(-3px);
+}
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <div class="header-left">
+                <h1><i class="fas fa-history"></i> Access Logs</h1>
+                <p>System access history and login records</p>
+            </div>
+            <div class="header-actions">
+                <a href="/admin_dashboard" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <button class="btn btn-success" onclick="exportData()">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+                <button class="btn btn-primary" onclick="loadAccessLogs()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon stat-info">
+                    <i class="fas fa-sign-in-alt"></i>
+                </div>
+                <div class="stat-value" id="totalLogs">0</div>
+                <div class="stat-label">Total Logs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-success">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="stat-value" id="successfulLogins">0</div>
+                <div class="stat-label">Successful</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-danger">
+                    <i class="fas fa-user-times"></i>
+                </div>
+                <div class="stat-value" id="failedLogins">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-value" id="suspiciousActivities">0</div>
+                <div class="stat-label">Suspicious</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="content-card">
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Date Range</label>
+                    <input type="date" id="dateFrom" class="filter-select">
+                </div>
+                <div class="filter-group">
+                    <label>to</label>
+                    <input type="date" id="dateTo" class="filter-select">
+                </div>
+                <div class="filter-group">
+                    <label>User Type</label>
+                    <select id="userTypeFilter" class="filter-select">
+                        <option value="">All Users</option>
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="success">Successful</option>
+                        <option value="failed">Failed</option>
+                        <option value="suspicious">Suspicious</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary" onclick="applyFilters()">
+                        <i class="fas fa-filter"></i> Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Access Logs Table -->
+        <div class="content-card">
+            <div class="card-header">
+                <h2><i class="fas fa-list"></i> Access History</h2>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search access logs..." onkeyup="searchLogs()">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="table" id="logs-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>User Type</th>
+                            <th>Login Time</th>
+                            <th>IP Address</th>
+                            <th>Status</th>
+                            <th>User Agent</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-tbody">
+                        <tr>
+                            <td colspan="7" class="loading">
+                                <div class="spinner"></div>
+                                <p>Loading access logs...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pagination">
+                <!-- Pagination will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allLogs = [];
+
+        // Load access logs on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAccessLogs();
+        });
+
+        async function loadAccessLogs() {
+            try {
+                showLoading('logs-tbody');
+                
+                const response = await fetch('/admin_api/get_access_logs');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allLogs = data.logs || [];
+                    updateStatistics(allLogs);
+                    renderLogs(allLogs);
+                } else {
+                    showNotification(data.error || 'Error loading access logs', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading access logs:', error);
+                showNotification('Error loading access logs', 'error');
+            }
+        }
+
+        function updateStatistics(logs) {
+            const total = logs.length;
+            const successful = logs.filter(log => log.status === 'success').length;
+            const failed = logs.filter(log => log.status === 'failed').length;
+            const suspicious = logs.filter(log => log.status === 'suspicious').length;
+
+            document.getElementById('totalLogs').textContent = total;
+            document.getElementById('successfulLogins').textContent = successful;
+            document.getElementById('failedLogins').textContent = failed;
+            document.getElementById('suspiciousActivities').textContent = suspicious;
+        }
+
+        function renderLogs(logs) {
+            const tbody = document.getElementById('logs-tbody');
+            
+            if (logs.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="no-data">
+                            <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                            <p>No access logs found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            logs.forEach(log => {
+                html += `
+                    <tr>
+                        <td>
+                            <strong>${log.user_name || 'Unknown'}</strong>
+                            ${log.user_id ? `<br><small>${log.user_id}</small>` : ''}
+                        </td>
+                        <td>
+                            <span class="status-badge ${getUserTypeClass(log.user_type)}">
+                                ${getUserTypeText(log.user_type)}
+                            </span>
+                        </td>
+                        <td>${formatDateTime(log.login_time)}</td>
+                        <td>${log.ip_address || 'N/A'}</td>
+                        <td>
+                            <span class="status-badge ${getStatusClass(log.status)}">
+                                ${getStatusText(log.status)}
+                            </span>
+                        </td>
+                        <td title="${log.user_agent || ''}">
+                            ${truncateText(log.user_agent, 50) || 'N/A'}
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewLogDetails(${log.id})" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${log.status === 'suspicious' ? `
+                                <button class="btn btn-danger" onclick="flagLog(${log.id})" title="Flag as Suspicious">
+                                    <i class="fas fa-flag"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        function getUserTypeClass(userType) {
+            switch(userType) {
+                case 'student': return 'status-info';
+                case 'faculty': return 'status-success';
+                case 'admin': return 'status-warning';
+                default: return 'status-info';
+            }
+        }
+
+        function getUserTypeText(userType) {
+            switch(userType) {
+                case 'student': return 'Student';
+                case 'faculty': return 'Faculty';
+                case 'admin': return 'Admin';
+                default: return userType || 'Unknown';
+            }
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'success': return 'status-success';
+                case 'failed': return 'status-danger';
+                case 'suspicious': return 'status-warning';
+                default: return 'status-info';
+            }
+        }
+
+        function getStatusText(status) {
+            switch(status) {
+                case 'success': return 'Successful';
+                case 'failed': return 'Failed';
+                case 'suspicious': return 'Suspicious';
+                default: return status;
+            }
+        }
+
+        function applyFilters() {
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            const userType = document.getElementById('userTypeFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            let filtered = allLogs;
+
+            if (dateFrom) {
+                filtered = filtered.filter(log => new Date(log.login_time) >= new Date(dateFrom));
+            }
+
+            if (dateTo) {
+                const endDate = new Date(dateTo);
+                endDate.setHours(23, 59, 59);
+                filtered = filtered.filter(log => new Date(log.login_time) <= endDate);
+            }
+
+            if (userType) {
+                filtered = filtered.filter(log => log.user_type === userType);
+            }
+
+            if (status) {
+                filtered = filtered.filter(log => log.status === status);
+            }
+
+            renderLogs(filtered);
+        }
+
+        function searchLogs() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#logs-tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        function viewLogDetails(logId) {
+            // Implement view details functionality
+            alert(`View details for log ID: ${logId}`);
+        }
+
+        function flagLog(logId) {
+            if (confirm('Mark this log as suspicious?')) {
+                // Implement flag functionality
+                showNotification('Log flagged as suspicious', 'success');
+            }
+        }
+
+        function exportData() {
+            // Implement export functionality
+            alert('Export functionality to be implemented');
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return 'N/A';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleString();
+            } catch (e) {
+                return 'Invalid Date';
+            }
+        }
+
+        function truncateText(text, maxLength) {
+            if (!text) return '';
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+
+        function showLoading(tbodyId) {
+            const tbody = document.getElementById(tbodyId);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading access logs...</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${message}
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

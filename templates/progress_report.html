@@ -1,0 +1,1380 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+/* ---------- Base Styles ---------- */
+:root {
+    --primary: #667eea;
+    --primary-light: rgba(102, 126, 234, 0.1);
+    --success: #10b981;
+    --success-light: rgba(16, 185, 129, 0.1);
+    --danger: #ef4444;
+    --danger-light: rgba(239, 68, 68, 0.1);
+    --warning: #f59e0b;
+    --warning-light: rgba(245, 158, 11, 0.1);
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    color: #374151;
+    line-height: 1.5;
+}
+
+/* ---------- Dashboard Container ---------- */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ---------- Header with Connection Status ---------- */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.header-content {
+    flex: 1;
+}
+
+.dashboard-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dashboard-title svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--primary);
+}
+
+.dashboard-subtitle {
+    font-size: 0.95rem;
+    color: var(--gray-600);
+    max-width: 500px;
+}
+
+/* Connection Status - Fixed duplicate issue */
+.connection-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--success-light);
+    color: var(--success);
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.connection-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Export Button in Header */
+.export-controls {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.export-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.export-btn:hover {
+    background: #5a6fd8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.export-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: white;
+}
+
+.export-dropdown {
+    position: relative;
+}
+
+.dropdown-btn {
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.dropdown-btn:hover {
+    border-color: var(--primary);
+}
+
+.dropdown-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--gray-500);
+    transition: transform 0.2s ease;
+}
+
+.dropdown-btn.active svg {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    min-width: 160px;
+    z-index: 100;
+    display: none;
+}
+
+.dropdown-menu.show {
+    display: block;
+    animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-item {
+    padding: 10px 16px;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    width: 100%;
+    background: none;
+    text-align: left;
+}
+
+.dropdown-item:hover {
+    background: var(--gray-50);
+}
+
+.dropdown-item svg {
+    width: 14px;
+    height: 14px;
+    fill: var(--gray-500);
+}
+
+/* ---------- Student Profile ---------- */
+.student-profile {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.student-avatar {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.student-avatar svg {
+    width: 32px;
+    height: 32px;
+    fill: white;
+}
+
+.student-info h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+}
+
+.student-info p {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin-bottom: 12px;
+}
+
+.student-meta {
+    display: flex;
+    gap: 20px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.meta-item svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--gray-500);
+}
+
+/* ---------- Stats Grid ---------- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--gray-200);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--card-color);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--icon-bg);
+}
+
+.stat-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--card-color);
+}
+
+.stat-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-600);
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+}
+
+.stat-trend {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: var(--trend-bg);
+    color: var(--trend-color);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-trend svg {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+}
+
+/* Stat Card Colors */
+.stat-primary {
+    --card-color: var(--primary);
+    --icon-bg: rgba(102, 126, 234, 0.1);
+    --trend-bg: rgba(102, 126, 234, 0.1);
+    --trend-color: var(--primary);
+}
+
+.stat-success {
+    --card-color: var(--success);
+    --icon-bg: rgba(16, 185, 129, 0.1);
+    --trend-bg: rgba(16, 185, 129, 0.1);
+    --trend-color: var(--success);
+}
+
+.stat-warning {
+    --card-color: var(--warning);
+    --icon-bg: rgba(245, 158, 11, 0.1);
+    --trend-bg: rgba(245, 158, 11, 0.1);
+    --trend-color: var(--warning);
+}
+
+.stat-danger {
+    --card-color: var(--danger);
+    --icon-bg: rgba(239, 68, 68, 0.1);
+    --trend-bg: rgba(239, 68, 68, 0.1);
+    --trend-color: var(--danger);
+}
+
+/* ---------- Attendance Table ---------- */
+.attendance-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--gray-200);
+    margin-bottom: 24px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-title svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--primary);
+}
+
+.table-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.filter-btn {
+    padding: 6px 12px;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background: var(--gray-200);
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.table-export-btn {
+    padding: 6px 12px;
+    background: var(--success);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.table-export-btn:hover {
+    background: #0da271;
+    transform: translateY(-1px);
+}
+
+.table-export-btn svg {
+    width: 14px;
+    height: 14px;
+    fill: white;
+}
+
+/* Scrollable Table Container */
+.table-container {
+    border-radius: 12px;
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-scroll {
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Custom scrollbar */
+.table-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+    background: var(--gray-100);
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 3px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+}
+
+/* Table Styles */
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.attendance-table thead {
+    position: sticky;
+    top: 0;
+    background: var(--gray-50);
+    z-index: 10;
+}
+
+.attendance-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--gray-600);
+    border-bottom: 2px solid var(--gray-200);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.attendance-table tbody tr {
+    border-bottom: 1px solid var(--gray-100);
+    transition: background 0.2s ease;
+}
+
+.attendance-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.attendance-table td {
+    padding: 14px 16px;
+    color: var(--gray-700);
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.status-present {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.status-absent {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+.status-late {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.status-badge svg {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+}
+
+/* Table Footer */
+.table-footer {
+    padding: 16px;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+.record-count {
+    font-weight: 500;
+}
+
+.record-count strong {
+    color: var(--gray-900);
+}
+
+/* ---------- Progress Section ---------- */
+.progress-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--gray-200);
+}
+
+.progress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.progress-card {
+    background: var(--gray-50);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--gray-200);
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.progress-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-600);
+}
+
+.progress-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+}
+
+.progress-fill.good {
+    background: linear-gradient(90deg, var(--success), #34d399);
+}
+
+.progress-fill.warning {
+    background: linear-gradient(90deg, var(--warning), #fbbf24);
+}
+
+.progress-fill.critical {
+    background: linear-gradient(90deg, var(--danger), #f87171);
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+/* ---------- Notification System ---------- */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 16px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border-left: 4px solid;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.success {
+    border-left-color: var(--success);
+}
+
+.notification.error {
+    border-left-color: var(--danger);
+}
+
+.notification.info {
+    border-left-color: var(--primary);
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.notification-icon {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.notification.success .notification-icon {
+    fill: var(--success);
+}
+
+.notification.error .notification-icon {
+    fill: var(--danger);
+}
+
+.notification.info .notification-icon {
+    fill: var(--primary);
+}
+
+.notification-message {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 8px;
+}
+
+.notification-close svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* ---------- Empty State ---------- */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-500);
+}
+
+.empty-state svg {
+    width: 48px;
+    height: 48px;
+    fill: var(--gray-300);
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    font-size: 0.875rem;
+    max-width: 300px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* ---------- Responsive Design ---------- */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 16px;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+    }
+    
+    .export-controls {
+        align-self: flex-start;
+    }
+    
+    .student-profile {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .student-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .table-controls {
+        justify-content: center;
+    }
+    
+    .table-footer {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .progress-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .notification {
+        left: 20px;
+        right: 20px;
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-title {
+        font-size: 1.25rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .attendance-table th,
+    .attendance-table td {
+        padding: 12px;
+    }
+    
+    .export-controls {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .export-btn, .dropdown-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Header with Export Controls -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <div>
+                    <h1 class="dashboard-title">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M16,11.78L20.24,4.45L21.97,5.45L16.74,14.5L10.23,10.75L5.46,19H22V21H2V3H4V17.54L9.5,8L16,11.78Z"/>
+                        </svg>
+                        Progress Report
+                    </h1>
+                    <p class="dashboard-subtitle">Comprehensive overview of your attendance performance</p>
+                </div>
+                <!-- Single Connection Status - Fixed duplicate -->
+                <div class="connection-status">
+                    <div class="connection-dot"></div>
+                    <span>Connected</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="export-controls">
+            
+            
+            <div class="export-dropdown">
+                <button class="dropdown-btn" onclick="toggleDropdown(this)">
+                    More
+                    <svg viewBox="0 0 24 24">
+                        <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
+                    </svg>
+                </button>
+                <div class="dropdown-menu">
+                    <button class="dropdown-item" onclick="exportToCSV()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M8,13V15H16V13H8M8,17V19H13V17H8Z"/>
+                        </svg>
+                        Export as CSV
+                    </button>
+                    <button class="dropdown-item" onclick="printReport()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M18,3H6V7H18M19,12A1,1 0 0,1 18,11A1,1 0 0,1 19,10A1,1 0 0,1 20,11A1,1 0 0,1 19,12M16,19H8V14H16M19,8H5A3,3 0 0,0 2,11V17H6V21H18V17H22V11A3,3 0 0,0 19,8Z"/>
+                        </svg>
+                        Print Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Student Profile -->
+    <div class="student-profile">
+        <div class="student-avatar">
+            <svg viewBox="0 0 24 24">
+                <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+            </svg>
+        </div>
+        <div class="student-info">
+            <h2>{{ student_name }}</h2>
+            <p>Attendance Analytics Dashboard</p>
+            <div class="student-meta">
+                <span class="meta-item">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"/>
+                    </svg>
+                    {{ records|length if records else 0 }} Classes
+                </span>
+                <span class="meta-item">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M16,11.78L20.24,4.45L21.97,5.45L16.74,14.5L10.23,10.75L5.46,19H22V21H2V3H4V17.54L9.5,8L16,11.78Z"/>
+                    </svg>
+                    {% if records and records|length > 0 %}
+                        {{ ((records|selectattr('status', 'equalto', 'Present')|list|length / records|length) * 100)|round(1) }}%
+                    {% else %}0%{% endif %} Rate
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card stat-primary">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19M7,10H12V15H7V10Z"/>
+                    </svg>
+                </div>
+                <div class="stat-title">Total Classes</div>
+            </div>
+            <div class="stat-value">{{ records|length if records else 0 }}</div>
+            <div class="stat-trend">
+                Overall
+            </div>
+        </div>
+        
+        <div class="stat-card stat-success">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                    </svg>
+                </div>
+                <div class="stat-title">Present</div>
+            </div>
+            <div class="stat-value">
+                {{ records|selectattr('status', 'equalto', 'Present')|list|length if records else 0 }}
+            </div>
+            <div class="stat-trend">
+                <svg viewBox="0 0 24 24">
+                    <path d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"/>
+                </svg>
+                Good
+            </div>
+        </div>
+        
+        <div class="stat-card stat-danger">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                    </svg>
+                </div>
+                <div class="stat-title">Absent</div>
+            </div>
+            <div class="stat-value">
+                {{ records|selectattr('status', 'equalto', 'Absent')|list|length if records else 0 }}
+            </div>
+            <div class="stat-trend">
+                <svg viewBox="0 0 24 24">
+                    <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
+                </svg>
+                Needs Focus
+            </div>
+        </div>
+        
+        <div class="stat-card stat-warning">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.2,16.2L11,13V7H12.5V12.2L17,14.9L16.2,16.2Z"/>
+                    </svg>
+                </div>
+                <div class="stat-title">Late</div>
+            </div>
+            <div class="stat-value">
+                {{ records|selectattr('status', 'equalto', 'Late')|list|length if records and records|selectattr('status', 'equalto', 'Late') else 0 }}
+            </div>
+            <div class="stat-trend">
+                Caution
+            </div>
+        </div>
+    </div>
+    
+    <!-- Attendance Table with Export -->
+    <div class="attendance-section">
+        <div class="section-header">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M7,7H9V9H7V7M11,7H13V9H11V7M15,7H17V9H15V7M7,11H9V13H7V11M11,11H13V13H11V11M15,11H17V13H15V11M7,15H9V17H7V15M11,15H13V17H11V15M15,15H17V17H15V15Z"/>
+                </svg>
+                Attendance Records
+            </div>
+            <div class="table-controls">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="present">Present</button>
+                <button class="filter-btn" data-filter="absent">Absent</button>
+                <button class="filter-btn" data-filter="late">Late</button>
+                <button class="table-export-btn" onclick="exportTable()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/>
+                    </svg>
+                    Export Table
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <div class="table-scroll">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Lecture</th>
+                            <th>Time</th>
+                            <th>Faculty</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if records %}
+                            {% for record in records %}
+                            <tr class="record-row" data-status="{{ record.status|lower }}">
+                                <td>{{ record.date.strftime('%d %b, %Y') if record.date else 'N/A' }}</td>
+                                <td>
+                                    <div>{{ record.lecture_code }}</div>
+                                    <div style="font-size: 0.75rem; color: var(--gray-500);">{{ record.title[:30] }}{% if record.title|length > 30 %}...{% endif %}</div>
+                                </td>
+                                <td>{{ record.date.strftime('%I:%M %p') if record.date else '' }}</td>
+                                <td>{{ record.faculty_name }}</td>
+                                <td>
+                                    {% if record.status == 'Present' %}
+                                        <span class="status-badge status-present">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                                            </svg>
+                                            Present
+                                        </span>
+                                    {% elif record.status == 'Absent' %}
+                                        <span class="status-badge status-absent">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                                            </svg>
+                                            Absent
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge status-late">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.2,16.2L11,13V7H12.5V12.2L17,14.9L16.2,16.2Z"/>
+                                            </svg>
+                                            Late
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                        </svg>
+                                        <h3>No Attendance Records</h3>
+                                        <p>Your attendance history will appear here once recorded.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-footer">
+                <div class="record-count">
+                    Showing <strong>{{ records|length if records else 0 }}</strong> records
+                </div>
+                <div>
+                    {% if records and records|length > 0 %}
+                        Last updated: {{ records[0].date.strftime('%d %b %Y') if records[0].date else 'Today' }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Progress Overview -->
+    <div class="progress-section">
+        <div class="section-header">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24">
+                    <path d="M16,11.78L20.24,4.45L21.97,5.45L16.74,14.5L10.23,10.75L5.46,19H22V21H2V3H4V17.54L9.5,8L16,11.78Z"/>
+                </svg>
+                Performance Overview
+            </div>
+        </div>
+        <div class="progress-grid">
+            {% if records %}
+                {% set present_count = records|selectattr('status', 'equalto', 'Present')|list|length %}
+                {% set total_count = records|length %}
+                {% set attendance_rate = (present_count / total_count * 100) if total_count > 0 else 0 %}
+                
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <div class="progress-title">Overall Attendance</div>
+                        <div class="progress-value">{{ attendance_rate|round(1) }}%</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill {% if attendance_rate >= 75 %}good{% elif attendance_rate >= 50 %}warning{% else %}critical{% endif %}" 
+                             style="width: {{ attendance_rate }}%"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span>Present: {{ present_count }}</span>
+                        <span>Total: {{ total_count }}</span>
+                    </div>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <div class="progress-title">This Month</div>
+                        <div class="progress-value">--%</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill warning" style="width: 65%"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span>Calculating...</span>
+                    </div>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <div class="progress-title">Consistency</div>
+                        <div class="progress-value">--%</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill good" style="width: 80%"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span>Analysis pending</span>
+                    </div>
+                </div>
+            {% else %}
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <div class="progress-title">Overall Attendance</div>
+                        <div class="progress-value">0%</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span>No data available</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.export-dropdown')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
+
+    // Table filtering
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const tableRows = document.querySelectorAll('.record-row');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            const filter = this.dataset.filter;
+            let visibleCount = 0;
+            
+            // Show/hide rows based on filter
+            tableRows.forEach(row => {
+                if (filter === 'all' || row.dataset.status === filter) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Update record count
+            const countElement = document.querySelector('.record-count strong');
+            if (countElement) {
+                countElement.textContent = visibleCount;
+            }
+        });
+    });
+    
+    // Animate progress bars
+    const progressBars = document.querySelectorAll('.progress-fill');
+    progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 100);
+    });
+});
+
+// Toggle dropdown
+function toggleDropdown(button) {
+    const menu = button.nextElementSibling;
+    button.classList.toggle('active');
+    menu.classList.toggle('show');
+}
+
+// Notification system
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <svg class="notification-icon" viewBox="0 0 24 24">
+                <path d="${type === 'success' ? 'M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z' : 
+                         type === 'error' ? 'M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z' :
+                         'M13,9H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'}"/>
+            </svg>
+            <span class="notification-message">${message}</span>
+            <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                </svg>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => notification.classList.add('show'), 10);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }
+    }, 5000);
+}
+
+// Export Functions
+function exportToPDF() {
+    showNotification('Preparing PDF export...', 'info');
+    // Implement PDF export logic here
+    setTimeout(() => {
+        showNotification('PDF export complete!', 'success');
+    }, 1500);
+}
+
+function exportToCSV() {
+    showNotification('Exporting as CSV...', 'info');
+    
+    // Get table data
+    const rows = [];
+    const headers = ['Date', 'Lecture Code', 'Title', 'Time', 'Faculty', 'Status'];
+    rows.push(headers.join(','));
+    
+    document.querySelectorAll('.record-row').forEach(row => {
+        if (row.style.display !== 'none') {
+            const cells = row.querySelectorAll('td');
+            const data = [
+                cells[0].textContent.trim(),
+                cells[1].querySelector('div:first-child').textContent.trim(),
+                cells[1].querySelector('div:last-child').textContent.trim(),
+                cells[2].textContent.trim(),
+                cells[3].textContent.trim(),
+                cells[4].querySelector('.status-badge').textContent.trim()
+            ];
+            rows.push(data.map(cell => `"${cell}"`).join(','));
+        }
+    });
+    
+    // Create CSV content
+    const csvContent = rows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create download link
+    const link = document.createElement('a');
+    const fileName = `attendance_report_${new Date().toISOString().split('T')[0]}.csv`;
+    link.href = url;
+    link.setAttribute('download', fileName);
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showNotification('CSV exported successfully!', 'success');
+}
+
+function exportToExcel() {
+    showNotification('Exporting as Excel...', 'info');
+    // Implement Excel export logic here
+    setTimeout(() => {
+        showNotification('Excel export complete!', 'success');
+    }, 1500);
+}
+
+function printReport() {
+    showNotification('Opening print dialog...', 'info');
+    window.print();
+}
+
+function exportTable() {
+    exportToCSV();
+}
+</script>
+{% endblock %}

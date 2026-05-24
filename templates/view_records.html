@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="card slide-in-up">
+    <div class="table-header">
+        <h2>Attendance Records</h2>
+        <div class="header-actions">
+            <button class="btn btn-secondary" id="filter-btn">Filter</button>
+            <button class="btn btn-secondary" onclick="exportToCSV()">Export</button>
+        </div>
+    </div>
+    
+    <div class="filters-panel" id="filters-panel" style="display: none;">
+        <form id="filter-form">
+            <div class="filter-row">
+                <div class="form-group">
+                    <label for="lecture_filter" class="form-label">Lecture</label>
+                    <select id="lecture_filter" name="lecture_filter" class="form-input">
+                        <option value="">All Lectures</option>
+                        {% for lecture in lectures %}
+                        <option value="{{ lecture.id }}">{{ lecture.lecture_code }} - {{ lecture.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="student_filter" class="form-label">Student</label>
+                    <select id="student_filter" name="student_filter" class="form-input">
+                        <option value="">All Students</option>
+                        {% for student in students %}
+                        <option value="{{ student.id }}">{{ student.name }} ({{ student.student_id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="faculty_filter" class="form-label">Faculty</label>
+                    <select id="faculty_filter" name="faculty_filter" class="form-input">
+                        <option value="">All Faculty</option>
+                        {% for faculty in faculty_members %}
+                        <option value="{{ faculty.id }}">{{ faculty.name }} ({{ faculty.faculty_id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-row">
+                <div class="form-group">
+                    <label for="date_from" class="form-label">From Date</label>
+                    <input type="date" id="date_from" name="date_from" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="date_to" class="form-label">To Date</label>
+                    <input type="date" id="date_to" name="date_to" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="status_filter" class="form-label">Status</label>
+                    <select id="status_filter" name="status_filter" class="form-input">
+                        <option value="">All Status</option>
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button type="button" class="btn btn-secondary" id="reset-filters">Reset</button>
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="data-table" id="records-table">
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Student</th>
+                    <th>Student ID</th>
+                    <th>Lecture</th>
+                    <th>Faculty</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.attendance_time }}</td>
+                    <td>{{ record.student_name }}</td>
+                    <td>{{ record.student_id }}</td>
+                    <td>{{ record.lecture_code }} - {{ record.lecture_title }}</td>
+                    <td>{{ record.faculty_name }}</td>
+                    <td>
+                        <span class="status-{{ record.status|lower }}">{{ record.status }}</span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon view-record" data-record-id="{{ record.id }}" title="View Details">👁️</button>
+                            <button class="btn-icon edit-record" data-record-id="{{ record.id }}" title="Edit">✏️</button>
+                            <button class="btn-icon btn-danger delete-record" data-record-id="{{ record.id }}" title="Delete">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="no-data">No attendance records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="table-footer">
+        <div class="table-info">
+            Showing <span id="records-count">{{ records|length }}</span> records
+        </div>
+        <div class="pagination">
+            <button class="btn btn-sm" id="prev-page" disabled>Previous</button>
+            <span class="page-number">Page 1 of <span id="total-pages">1</span></span>
+            <button class="btn btn-sm" id="next-page" disabled>Next</button>
+        </div>
+    </div>
+</div>
+
+<!-- Record Detail Modal -->
+<div class="modal" id="record-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Attendance Record Details</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="record-details">
+                <div class="detail-row">
+                    <div class="detail-label">Student:</div>
+                    <div class="detail-value" id="modal-student"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Student ID:</div>
+                    <div class="detail-value" id="modal-student-id"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Lecture:</div>
+                    <div class="detail-value" id="modal-lecture"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Faculty:</div>
+                    <div class="detail-value" id="modal-faculty"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Date & Time:</div>
+                    <div class="detail-value" id="modal-datetime"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Status:</div>
+                    <div class="detail-value" id="modal-status"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="close-modal">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Record Modal -->
+<div class="modal" id="edit-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Attendance Record</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="edit-record-form">
+                <input type="hidden" id="edit-record-id" name="record_id">
+                
+                <div class="form-group">
+                    <label for="edit-status" class="form-label">Status</label>
+                    <select id="edit-status" name="status" class="form-input" required>
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-datetime" class="form-label">Date & Time</label>
+                    <input type="datetime-local" id="edit-datetime" name="datetime" class="form-input" required>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-edit">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter panel toggle
+        const filterBtn = document.getElementById('filter-btn');
+        const filterPanel = document.getElementById('filters-panel');
+        
+        filterBtn.addEventListener('click', function() {
+            if (filterPanel.style.display === 'none') {
+                filterPanel.style.display = 'block';
+                filterBtn.textContent = 'Hide Filters';
+            } else {
+                filterPanel.style.display = 'none';
+                filterBtn.textContent = 'Filter';
+            }
+        });
+        
+        // Reset filters
+        document.getElementById('reset-filters').addEventListener('click', function() {
+            document.getElementById('filter-form').reset();
+        });
+        
+        // Apply filters
+        document.getElementById('filter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            applyFilters();
+        });
+        
+        // View record details
+        const viewButtons = document.querySelectorAll('.view-record');
+        const recordModal = document.getElementById('record-modal');
+        const closeModal = document.getElementById('close-modal');
+        
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const recordId = this.getAttribute('data-record-id');
+                fetchRecordDetails(recordId);
+            });
+        });
+        
+        closeModal.addEventListener('click', function() {
+            recordModal.style.display = 'none';
+        });
+        
+        // Edit record
+        const editButtons = document.querySelectorAll('.edit-record');
+        const editModal = document.getElementById('edit-modal');
+        const cancelEdit = document.getElementById('cancel-edit');
+        
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const recordId = this.getAttribute('data-record-id');
+                openEditModal(recordId);
+            });
+        });
+        
+        cancelEdit.addEventListener('click', function() {
+            editModal.style.display = 'none';
+        });
+        
+        // Delete record
+        const deleteButtons = document.querySelectorAll('.delete-record');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const recordId = this.getAttribute('data-record-id');
+                if (confirm('Are you sure you want to delete this attendance record?')) {
+                    deleteRecord(recordId);
+                }
+            });
+        });
+        
+        // Initialize pagination
+        initPagination();
+    });
+    
+    function applyFilters() {
+        const formData = new FormData(document.getElementById('filter-form'));
+        const params = new URLSearchParams();
+        
+        for (const [key, value] of formData.entries()) {
+            if (value) params.append(key, value);
+        }
+        
+        fetch('/filter_records?' + params.toString())
+            .then(response => response.json())
+            .then(data => {
+                updateTable(data.records);
+                document.getElementById('records-count').textContent = data.records.length;
+                document.getElementById('filter-btn').textContent = 'Filter';
+                document.getElementById('filters-panel').style.display = 'none';
+            });
+    }
+    
+    function updateTable(records) {
+        const tbody = document.querySelector('#records-table tbody');
+        tbody.innerHTML = '';
+        
+        if (records.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="no-data">No attendance records found.</td></tr>';
+            return;
+        }
+        
+        records.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${record.attendance_time}</td>
+                <td>${record.student_name}</td>
+                <td>${record.student_id}</td>
+                <td>${record.lecture_code} - ${record.lecture_title}</td>
+                <td>${record.faculty_name}</td>
+                <td><span class="status-${record.status.toLowerCase()}">${record.status}</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-icon view-record" data-record-id="${record.id}" title="View Details">👁️</button>
+                        <button class="btn-icon edit-record" data-record-id="${record.id}" title="Edit">✏️</button>
+                        <button class="btn-icon btn-danger delete-record" data-record-id="${record.id}" title="Delete">🗑️</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        // Reattach event listeners to new buttons
+        attachEventListeners();
+    }
+    
+    function fetchRecordDetails(recordId) {
+        fetch('/get_record_details/' + recordId)
+            .then(response => response.json())
+            .then(record => {
+                document.getElementById('modal-student').textContent = record.student_name;
+                document.getElementById('modal-student-id').textContent = record.student_id;
+                document.getElementById('modal-lecture').textContent = `${record.lecture_code} - ${record.lecture_title}`;
+                document.getElementById('modal-faculty').textContent = record.faculty_name;
+                document.getElementById('modal-datetime').textContent = record.attendance_time;
+                document.getElementById('modal-status').innerHTML = `<span class="status-${record.status.toLowerCase()}">${record.status}</span>`;
+                
+                document.getElementById('record-modal').style.display = 'block';
+            });
+    }
+    
+    function openEditModal(recordId) {
+        fetch('/get_record_details/' + recordId)
+            .then(response => response.json())
+            .then(record => {
+                document.getElementById('edit-record-id').value = record.id;
+                document.getElementById('edit-status').value = record.status;
+                
+                // Convert datetime to local format for the input
+                const dt = new Date(record.attendance_time);
+                const localDT = dt.toISOString().slice(0, 16);
+                document.getElementById('edit-datetime').value = localDT;
+                
+                document.getElementById('edit-modal').style.display = 'block';
+            });
+    }
+    
+    function deleteRecord(recordId) {
+        fetch('/delete_record/' + recordId, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Record deleted successfully', 'success');
+                    // Remove the row from the table
+                    document.querySelector(`button[data-record-id="${recordId}"]`).closest('tr').remove();
+                } else {
+                    showNotification('Error deleting record: ' + data.message, 'error');
+                }
+            });
+    }
+    
+    function initPagination() {
+        // This would be implemented based on your backend pagination
+        // For now, we'll just disable the buttons if there's only one page
+        const totalPages = Math.ceil({{ records|length }} / 20);
+        document.getElementById('total-pages').textContent = totalPages;
+        
+        if (totalPages <= 1) {
+            document.getElementById('prev-page').disabled = true;
+            document.getElementById('next-page').disabled = true;
+        }
+    }
+    
+    function attachEventListeners() {
+        // Reattach event listeners to dynamically created elements
+        document.querySelectorAll('.view-record').forEach(button => {
+            button.addEventListener('click', function() {
+                const recordId = this.getAttribute('data-record-id');
+                fetchRecordDetails(recordId);
+            });
+        });
+        
+        document.querySelectorAll('.edit-record').forEach(button => {
+            button.addEventListener('click', function() {
+                const recordId = this.getAttribute('data-record-id');
+                openEditModal(recordId);
+            });
+        });
+        
+        document.querySelectorAll('.delete-record').forEach(button => {
+            button.addEventListener('click', function() {
+                const recordId = this.getAttribute('data-record-id');
+                if (confirm('Are you sure you want to delete this attendance record?')) {
+                    deleteRecord(recordId);
+                }
+            });
+        });
+    }
+    
+    function exportToCSV() {
+        // Get filter values
+        const lectureFilter = document.getElementById('lecture_filter').value;
+        const studentFilter = document.getElementById('student_filter').value;
+        const facultyFilter = document.getElementById('faculty_filter').value;
+        const dateFrom = document.getElementById('date_from').value;
+        const dateTo = document.getElementById('date_to').value;
+        const statusFilter = document.getElementById('status_filter').value;
+        
+        // Build export URL with filters
+        let exportUrl = '/export_records?';
+        if (lectureFilter) exportUrl += `lecture=${lectureFilter}&`;
+        if (studentFilter) exportUrl += `student=${studentFilter}&`;
+        if (facultyFilter) exportUrl += `faculty=${facultyFilter}&`;
+        if (dateFrom) exportUrl += `from=${dateFrom}&`;
+        if (dateTo) exportUrl += `to=${dateTo}&`;
+        if (statusFilter) exportUrl += `status=${statusFilter}&`;
+        
+        // Remove trailing & or ? if no params
+        if (exportUrl.endsWith('&') || exportUrl.endsWith('?')) {
+            exportUrl = exportUrl.slice(0, -1);
+        }
+        
+        // Trigger download
+        window.location.href = exportUrl;
+    }
+</script>
+{% endblock %}

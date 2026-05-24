@@ -1,0 +1,1221 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+    /* ===== GLOBAL VARIABLES ===== */
+    :root {
+        /* Primary Colors */
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --primary-light: #818cf8;
+        --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        
+        /* Secondary Colors */
+        --secondary: #10b981;
+        --secondary-dark: #059669;
+        --secondary-light: #34d399;
+        
+        /* Status Colors */
+        --danger: #ef4444;
+        --danger-dark: #dc2626;
+        --warning: #f59e0b;
+        --success: #10b981;
+        --info: #3b82f6;
+        
+        /* Neutral Colors */
+        --light: #f8fafc;
+        --light-gray: #e2e8f0;
+        --gray: #94a3b8;
+        --dark-gray: #475569;
+        --dark: #1e293b;
+        
+        /* Backgrounds */
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --bg-hover: #f1f5f9;
+        --bg-card: #ffffff;
+        
+        /* Shadows */
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        
+        /* Borders */
+        --border: #e2e8f0;
+        --border-light: #f1f5f9;
+        
+        /* Transitions */
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        /* Border Radius */
+        --radius-sm: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+    }
+    
+    /* ===== BASE STYLES ===== */
+    body {
+        background: var(--bg-secondary);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--dark);
+    }
+    
+    /* ===== CARD & LAYOUT ===== */
+    .card {
+        background: var(--bg-card);
+        border-radius: var(--radius-xl);
+        padding: 2rem;
+        margin: 1.5rem 0;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-light);
+        transition: var(--transition);
+        animation: fadeIn 0.5s ease-out;
+    }
+    
+    .card:hover {
+        box-shadow: var(--shadow-xl);
+    }
+    
+    .slide-in-up {
+        animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+        from { 
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* ===== HEADER ===== */
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-light);
+    }
+    
+    .table-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+    }
+    
+    /* ===== BUTTONS ===== */
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-lg);
+        border: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        letter-spacing: 0.025em;
+    }
+    
+    .btn-primary {
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn-secondary {
+        background: var(--bg-secondary);
+        color: var(--dark-gray);
+        border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+        background: var(--bg-hover);
+        border-color: var(--gray);
+    }
+    
+    /* Icon Buttons */
+    .btn-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: 0;
+        border-radius: var(--radius-md);
+        background: var(--bg-secondary);
+        color: var(--dark-gray);
+        border: 1px solid var(--border);
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+    }
+    
+    .btn-icon:hover {
+        background: var(--bg-hover);
+        transform: translateY(-1px);
+        border-color: var(--gray);
+    }
+    
+    .btn-success {
+        background: var(--success);
+        color: white;
+        border: none;
+    }
+    
+    .btn-success:hover {
+        background: var(--secondary-dark);
+    }
+    
+    .btn-danger {
+        background: var(--danger);
+        color: white;
+        border: none;
+    }
+    
+    .btn-danger:hover {
+        background: var(--danger-dark);
+    }
+    
+    .btn-info {
+        background: var(--info);
+        color: white;
+        border: none;
+    }
+    
+    .btn-info:hover {
+        background: #2563eb;
+    }
+    
+    /* Action Buttons Container */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        opacity: 0.9;
+        transition: opacity 0.2s ease;
+    }
+    
+    tr:hover .action-buttons {
+        opacity: 1;
+    }
+    
+    /* ===== TABS ===== */
+    .tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        padding: 0.5rem;
+        background: var(--bg-secondary);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-light);
+    }
+    
+    .tab-btn {
+        flex: 1;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-md);
+        background: transparent;
+        color: var(--dark-gray);
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .tab-btn:hover {
+        background: var(--bg-hover);
+        color: var(--dark);
+    }
+    
+    .tab-btn.active {
+        background: white;
+        color: var(--primary);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    /* ===== TABLE STYLES ===== */
+    .table-responsive {
+        overflow-x: auto;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-light);
+        background: white;
+        margin-top: 1rem;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        min-width: 800px;
+    }
+    
+    .data-table thead {
+        background: var(--bg-secondary);
+    }
+    
+    .data-table th {
+        padding: 1rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--dark-gray);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        text-align: left;
+        border-bottom: 2px solid var(--border-light);
+        white-space: nowrap;
+    }
+    
+    .data-table td {
+        padding: 1rem 1.25rem;
+        color: var(--dark);
+        font-size: 0.875rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .data-table tbody tr {
+        transition: var(--transition);
+    }
+    
+    .data-table tbody tr:hover {
+        background: var(--bg-hover);
+    }
+    
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    /* Faculty Badge */
+    .faculty-badge {
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+        color: white;
+        padding: 0.375rem 0.875rem;
+        border-radius: 2rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        white-space: nowrap;
+    }
+    
+    .faculty-badge::before {
+        content: "👨‍🏫";
+        font-size: 0.875rem;
+    }
+    
+    /* Unassigned Badge */
+    .unassigned-badge {
+        background: var(--bg-secondary);
+        color: var(--gray);
+        padding: 0.375rem 0.875rem;
+        border-radius: 2rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        border: 1px dashed var(--border);
+        font-style: italic;
+    }
+    
+    /* Count Badge */
+    .count-badge {
+        background: var(--bg-secondary);
+        color: var(--dark);
+        padding: 0.375rem 0.875rem;
+        border-radius: var(--radius-md);
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid var(--border);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+    
+    .count-badge::before {
+        content: "📊";
+    }
+    
+    /* ===== MODALS ===== */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(8px);
+        z-index: 1000;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .modal-content {
+        background: white;
+        width: 90%;
+        max-width: 500px;
+        margin: 2rem auto;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+        animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--border-light);
+        overflow: hidden;
+    }
+    
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-50px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    
+    .modal-header {
+        padding: 1.5rem 2rem;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+        color: var(--dark);
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    .close {
+        font-size: 1.5rem;
+        color: var(--gray);
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: var(--radius-sm);
+        transition: var(--transition);
+        line-height: 1;
+    }
+    
+    .close:hover {
+        color: var(--danger);
+        background: var(--bg-hover);
+    }
+    
+    .modal-body {
+        padding: 2rem;
+    }
+    
+    /* ===== FORMS ===== */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--dark);
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .form-input,
+    textarea.form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: white;
+        color: var(--dark);
+        font-size: 0.875rem;
+        transition: var(--transition);
+    }
+    
+    .form-input:focus,
+    textarea.form-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    textarea.form-input {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    /* ===== STATUS MESSAGES ===== */
+    .status-message {
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius-lg);
+        margin: 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        animation: slideUp 0.3s ease-out;
+    }
+    
+    .status-success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+    
+    .status-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+    
+    .status-warning {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+    }
+    
+    /* ===== LOADING STATES ===== */
+    .loading {
+        display: inline-block;
+        width: 1.25rem;
+        height: 1.25rem;
+        border: 2px solid var(--light-gray);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 768px) {
+        .card {
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .table-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .tabs {
+            flex-direction: column;
+        }
+        
+        .modal-content {
+            width: 95%;
+            margin: 1rem auto;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+    
+    /* ===== NO DATA STATE ===== */
+    .no-data {
+        text-align: center;
+        padding: 3rem !important;
+        color: var(--gray);
+        font-size: 1rem;
+    }
+    
+    .no-data::before {
+        content: "📚";
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 1rem;
+    }
+    
+    /* ===== CUSTOM SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: var(--gray);
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--dark-gray);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card slide-in-up">
+    <div class="table-header">
+        <h2>📚 Lecture Management</h2>
+        <button class="btn btn-primary" id="add-lecture-btn">
+            <span>+</span>
+            Add New Lecture
+        </button>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="all-lectures">
+            <span>👥</span>
+            All Lectures
+        </button>
+        <button class="tab-btn" data-tab="my-lectures">
+            <span>👨‍🏫</span>
+            My Lectures
+        </button>
+    </div>
+    
+    <!-- All Lectures Tab -->
+    <div class="tab-content active" id="all-lectures">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Faculty</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lecture in lectures %}
+                    <tr data-lecture-id="{{ lecture.id }}">
+                        <td>
+                            <strong>{{ lecture.lecture_code }}</strong>
+                        </td>
+                        <td>
+                            <div style="font-weight: 600; color: var(--dark);">
+                                {{ lecture.title }}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="color: var(--dark-gray); font-size: 0.875rem;">
+                                {{ lecture.description|default('No description provided', true) }}
+                            </div>
+                        </td>
+                        <td>
+                            {% set assigned_faculty = namespace(name='Not assigned', faculty_id=none) %}
+                            {% for assignment in all_faculty_assignments %}
+                                {% if assignment.lecture_id == lecture.id %}
+                                    {% set assigned_faculty.name = assignment.faculty_name %}
+                                    {% set assigned_faculty.faculty_id = assignment.faculty_id %}
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if assigned_faculty.name %}
+                                <span class="faculty-badge">{{ assigned_faculty.name }}</span>
+                            {% else %}
+                                <span class="unassigned-badge">Not assigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                {% set is_assigned = false %}
+                                {% set current_faculty_id = session.get('faculty_id') %}
+                                
+                                {# Check if current faculty is assigned to this lecture #}
+                                {% for assignment in all_faculty_assignments %}
+                                    {% if assignment.lecture_id == lecture.id and assignment.faculty_id == current_faculty_id %}
+                                        {% set is_assigned = true %}
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if is_assigned %}
+                                <button class="btn-icon btn-danger unassign-btn" 
+                                        data-lecture-id="{{ lecture.id }}"
+                                        data-lecture-code="{{ lecture.lecture_code }}"
+                                        title="Unassign from me">
+                                    <span>➖</span>
+                                </button>
+                                {% else %}
+                                <button class="btn-icon btn-success assign-btn" 
+                                        data-lecture-id="{{ lecture.id }}"
+                                        data-lecture-code="{{ lecture.lecture_code }}"
+                                        title="Assign to me">
+                                    <span>➕</span>
+                                </button>
+                                {% endif %}
+                                
+                                <button class="btn-icon edit-lecture-btn" 
+                                        data-lecture-id="{{ lecture.id }}"
+                                        title="Edit Lecture">
+                                    <span>✏️</span>
+                                </button>
+                                
+                                <button class="btn-icon btn-danger delete-lecture-btn" 
+                                        data-lecture-id="{{ lecture.id }}"
+                                        data-lecture-code="{{ lecture.lecture_code }}"
+                                        title="Delete Lecture">
+                                    <span>🗑️</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="no-data">
+                            No lectures found. Create your first lecture!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- My Lectures Tab -->
+    <div class="tab-content" id="my-lectures">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Attendance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set current_faculty_id = session.get('faculty_id') %}
+                    {% set has_my_lectures = false %}
+                    
+                    {% for lecture in faculty_lectures %}
+                        {% if lecture.faculty_id == current_faculty_id %}
+                            {% set has_my_lectures = true %}
+                            <tr>
+                                <td>
+                                    <strong>{{ lecture.lecture_code }}</strong>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--dark);">
+                                        {{ lecture.title }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="color: var(--dark-gray); font-size: 0.875rem;">
+                                        {{ lecture.description|default('No description provided', true) }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="count-badge">{{ lecture.attendance_count }} records</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('view_attendance', lecture_id=lecture.id) }}" 
+                                           class="btn-icon btn-info"
+                                           title="View Attendance">
+                                            <span>👁️</span>
+                                        </a>
+                                        
+                                        <a href="{{ url_for('take_attendance') }}?lecture_id={{ lecture.id }}" 
+                                           class="btn-icon btn-success"
+                                           title="Take Attendance">
+                                            <span>📷</span>
+                                        </a>
+                                        
+                                        <button class="btn-icon btn-danger unassign-btn" 
+                                                data-lecture-id="{{ lecture.id }}"
+                                                data-lecture-code="{{ lecture.lecture_code }}"
+                                                title="Unassign from me">
+                                            <span>➖</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if not has_my_lectures %}
+                    <tr>
+                        <td colspan="5" class="no-data">
+                            You haven't been assigned to any lectures yet.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Lecture Modal -->
+<div class="modal" id="add-lecture-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>➕ Add New Lecture</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="add-lecture-form">
+                <div class="form-group">
+                    <label for="lecture_code" class="form-label">Lecture Code *</label>
+                    <input type="text" id="lecture_code" name="lecture_code" 
+                           class="form-input" required
+                           placeholder="e.g., CS101, MATH201">
+                </div>
+                
+                <div class="form-group">
+                    <label for="title" class="form-label">Lecture Title *</label>
+                    <input type="text" id="title" name="title" 
+                           class="form-input" required
+                           placeholder="e.g., Introduction to Computer Science">
+                </div>
+                
+                <div class="form-group">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea id="description" name="description" 
+                              class="form-input" rows="4"
+                              placeholder="Brief description of the lecture content..."></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-add">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submit-add">
+                        Create Lecture
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Lecture Modal -->
+<div class="modal" id="edit-lecture-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>✏️ Edit Lecture</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="edit-lecture-form">
+                <input type="hidden" id="edit-lecture-id" name="lecture_id">
+                
+                <div class="form-group">
+                    <label for="edit-lecture_code" class="form-label">Lecture Code *</label>
+                    <input type="text" id="edit-lecture_code" name="lecture_code" 
+                           class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-title" class="form-label">Lecture Title *</label>
+                    <input type="text" id="edit-title" name="title" 
+                           class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-description" class="form-label">Description</label>
+                    <textarea id="edit-description" name="description" 
+                              class="form-input" rows="4"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-edit">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submit-edit">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Status Message Container -->
+<div id="status-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing lecture management...');
+        
+        // Status message system
+        function showStatus(message, type = 'success', duration = 3000) {
+            const statusContainer = document.getElementById('status-container');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.innerHTML = `
+                <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️'}</span>
+                <span>${message}</span>
+            `;
+            statusContainer.appendChild(statusDiv);
+            
+            // Remove after duration
+            setTimeout(() => {
+                statusDiv.style.opacity = '0';
+                statusDiv.style.transform = 'translateX(100%)';
+                setTimeout(() => statusDiv.remove(), 300);
+            }, duration);
+        }
+        
+        // Tab functionality
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Update active tab button
+                tabBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show selected tab content
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === tabId) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        // Modal functionality
+        const addModal = document.getElementById('add-lecture-modal');
+        const editModal = document.getElementById('edit-lecture-modal');
+        const addBtn = document.getElementById('add-lecture-btn');
+        const closeBtns = document.querySelectorAll('.close');
+        const cancelAddBtn = document.getElementById('cancel-add');
+        const cancelEditBtn = document.getElementById('cancel-edit');
+        
+        function openModal(modal) {
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal(modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        addBtn.addEventListener('click', () => openModal(addModal));
+        cancelAddBtn.addEventListener('click', () => closeModal(addModal));
+        cancelEditBtn.addEventListener('click', () => closeModal(editModal));
+        
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                closeModal(addModal);
+                closeModal(editModal);
+            });
+        });
+        
+        window.addEventListener('click', function(event) {
+            if (event.target === addModal) closeModal(addModal);
+            if (event.target === editModal) closeModal(editModal);
+        });
+        
+        // Lecture assignment functionality
+        document.addEventListener('click', async function(e) {
+            // Assign lecture
+            if (e.target.closest('.assign-btn')) {
+                const btn = e.target.closest('.assign-btn');
+                const lectureId = btn.getAttribute('data-lecture-id');
+                const lectureCode = btn.getAttribute('data-lecture-code');
+                
+                console.log('Assigning lecture:', lectureId, lectureCode);
+                
+                try {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="loading"></span>';
+                    
+                    const response = await fetch('/manage_lecture_assignment', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ 
+                            lecture_id: parseInt(lectureId),  // Ensure it's integer
+                            assign: true 
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    console.log('Assign response:', data);
+                    
+                    if (data.success) {
+                        showStatus(`Assigned to lecture ${lectureCode} successfully!`, 'success');
+                        // Refresh the page after a short delay
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showStatus(data.message || 'Failed to assign lecture', 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>➕</span>';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showStatus('Network error. Please try again.', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>➕</span>';
+                }
+            }
+            
+            // Unassign lecture
+            if (e.target.closest('.unassign-btn')) {
+                const btn = e.target.closest('.unassign-btn');
+                const lectureId = btn.getAttribute('data-lecture-id');
+                const lectureCode = btn.getAttribute('data-lecture-code');
+                
+                console.log('Unassigning lecture:', lectureId, lectureCode);
+                
+                if (!confirm(`Are you sure you want to unassign from "${lectureCode}"?`)) return;
+                
+                try {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="loading"></span>';
+                    
+                    const response = await fetch('/manage_lecture_assignment', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ 
+                            lecture_id: parseInt(lectureId),  // Ensure it's integer
+                            assign: false 
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    console.log('Unassign response:', data);
+                    
+                    if (data.success) {
+                        showStatus(`Unassigned from ${lectureCode} successfully!`, 'success');
+                        // Refresh the page after a short delay
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showStatus(data.message || 'Failed to unassign lecture', 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>➖</span>';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showStatus('Network error. Please try again.', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>➖</span>';
+                }
+            }
+        });
+        
+        // Add lecture form
+        const addForm = document.getElementById('add-lecture-form');
+        const submitAddBtn = document.getElementById('submit-add');
+        
+        addForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const originalText = submitAddBtn.textContent;
+            
+            try {
+                submitAddBtn.disabled = true;
+                submitAddBtn.innerHTML = '<span class="loading"></span> Creating...';
+                
+                const response = await fetch('/add_lecture', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                console.log('Add lecture response:', data);
+                
+                if (data.success) {
+                    showStatus('Lecture created successfully!', 'success');
+                    closeModal(addModal);
+                    addForm.reset();
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showStatus(data.message || 'Failed to create lecture', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('Network error. Please try again.', 'error');
+            } finally {
+                submitAddBtn.disabled = false;
+                submitAddBtn.textContent = originalText;
+            }
+        });
+        
+        // Edit lecture functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.edit-lecture-btn')) {
+                const btn = e.target.closest('.edit-lecture-btn');
+                const lectureId = btn.getAttribute('data-lecture-id');
+                const row = btn.closest('tr');
+                
+                document.getElementById('edit-lecture-id').value = lectureId;
+                document.getElementById('edit-lecture_code').value = row.cells[0].textContent.trim();
+                document.getElementById('edit-title').value = row.cells[1].querySelector('div').textContent.trim();
+                document.getElementById('edit-description').value = row.cells[2].querySelector('div').textContent.trim();
+                
+                openModal(editModal);
+            }
+        });
+        
+        // Edit lecture form
+        const editForm = document.getElementById('edit-lecture-form');
+        const submitEditBtn = document.getElementById('submit-edit');
+        
+        editForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const originalText = submitEditBtn.textContent;
+            
+            try {
+                submitEditBtn.disabled = true;
+                submitEditBtn.innerHTML = '<span class="loading"></span> Saving...';
+                
+                const response = await fetch('/update_lecture', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                console.log('Update lecture response:', data);
+                
+                if (data.success) {
+                    showStatus('Lecture updated successfully!', 'success');
+                    closeModal(editModal);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showStatus(data.message || 'Failed to update lecture', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('Network error. Please try again.', 'error');
+            } finally {
+                submitEditBtn.disabled = false;
+                submitEditBtn.textContent = originalText;
+            }
+        });
+        
+        // Delete lecture functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.delete-lecture-btn')) {
+                const btn = e.target.closest('.delete-lecture-btn');
+                const lectureId = btn.getAttribute('data-lecture-id');
+                const lectureCode = btn.getAttribute('data-lecture-code');
+                
+                if (!confirm(`⚠️ Are you sure you want to delete "${lectureCode}"?\n\nThis action will permanently delete the lecture and all associated attendance records!`)) return;
+                
+                (async () => {
+                    try {
+                        btn.disabled = true;
+                        const originalHTML = btn.innerHTML;
+                        btn.innerHTML = '<span class="loading"></span>';
+                        
+                        const response = await fetch('/delete_lecture/' + lectureId, {
+                            method: 'DELETE'
+                        });
+                        
+                        const data = await response.json();
+                        console.log('Delete lecture response:', data);
+                        
+                        if (data.success) {
+                            showStatus(`Lecture "${lectureCode}" deleted successfully!`, 'success');
+                            // Remove row with animation
+                            const row = btn.closest('tr');
+                            row.style.opacity = '0';
+                            row.style.transform = 'translateX(-100%)';
+                            setTimeout(() => {
+                                if (row.parentNode) {
+                                    row.remove();
+                                }
+                            }, 300);
+                        } else {
+                            showStatus(data.message || 'Failed to delete lecture', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalHTML;
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showStatus('Network error. Please try again.', 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = originalHTML;
+                    }
+                })();
+            }
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal(addModal);
+                closeModal(editModal);
+            }
+        });
+        
+        console.log('Lecture management initialized successfully');
+    });
+</script>
+{% endblock %}

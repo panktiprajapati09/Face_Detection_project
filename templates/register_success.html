@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.success-card {
+    width: 480px;
+    padding: 2.5rem 2.2rem;
+    background: #ffffff;
+    border-radius: 25px;
+    box-shadow: 
+        10px 10px 35px rgba(0,0,0,0.08),
+        -5px -5px 25px rgba(255,255,255,1);
+    text-align: center;
+    animation: softFade 0.7s ease-out;
+    margin: auto;
+    margin-top: 5%;
+}
+
+@keyframes softFade {
+    from { opacity: 0; transform: translateY(35px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Success Icon */
+.success-icon {
+    font-size: 60px;
+    color: #28a745; /* green success color */
+    margin-bottom: 15px;
+}
+
+/* Headings & Text */
+.success-card h2 {
+    font-size: 2rem;
+    color: #2c2c2c;
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.success-card p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 12px;
+}
+
+/* Buttons */
+.btn-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #3a0ca3, #7209b7);
+    color: white;
+    box-shadow: 0 4px 14px rgba(58,12,163,0.4);
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(58,12,163,0.55);
+}
+
+.btn-secondary {
+    background: #f0f4ff;
+    color: #3a0ca3;
+    border: 1.5px solid #3a0ca3;
+}
+
+.btn-secondary:hover {
+    transform: scale(1.05);
+    background: #e6e9ff;
+}
+</style>
+
+<div class="success-card">
+    <!-- Font Awesome Check Icon -->
+    <i class="fa-solid fa-circle-check success-icon"></i>
+
+    <h2>Registration Successful!</h2>
+    <p>Your registration has been completed successfully. You can now use the face recognition attendance system.</p>
+    <p>Your student ID: <strong>{{ student_id }}</strong></p>
+
+    <div class="btn-container">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Return to Home</a>
+        <a href="{{ url_for('student_login') }}" class="btn btn-secondary">Student Login</a>
+    </div>
+</div>
+{% endblock %}

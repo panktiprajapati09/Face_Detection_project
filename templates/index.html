@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Feature Icon Styles */
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(58, 12, 163, 0.1) 0%, rgba(67, 97, 238, 0.1) 100%);
+        transition: all 0.3s ease;
+    }
+
+    .feature-icon svg {
+        width: 40px;
+        height: 40px;
+        color: #3a0ca3;
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon {
+        background: linear-gradient(135deg, rgba(58, 12, 163, 0.15) 0%, rgba(67, 97, 238, 0.15) 100%);
+        transform: scale(1.1);
+    }
+
+    .feature-card:hover .feature-icon svg {
+        transform: scale(1.1);
+        color: #2a0877;
+    }
+
+    /* Additional Professional Styling */
+    .features {
+        margin-bottom: 80px;
+    }
+
+    .features h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 50px;
+        color: #1a1a2e;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+    }
+
+    .feature-card {
+        background: white;
+        padding: 40px 30px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(58, 12, 163, 0.08);
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+    }
+
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    }
+
+    .feature-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: #1a1a2e;
+        font-weight: 600;
+    }
+
+    .feature-card p {
+        color: #6c757d;
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+
+    /* Responsive Design for Features */
+    @media (max-width: 768px) {
+        .feature-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .feature-card {
+            padding: 30px 20px;
+        }
+        
+        .features h2 {
+            font-size: 2rem;
+        }
+        
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+        }
+        
+        .feature-icon svg {
+            width: 35px;
+            height: 35px;
+        }
+    }
+</style>
+
+<div class="hero fade-in">
+    <h1>Smart Face Recognition Attendance System</h1>
+    <p>Revolutionize your attendance tracking with AI-powered face recognition technology. Fast, accurate, and secure.</p>
+    
+    <div class="btn-container">
+        <a href="{{ url_for('faculty_login') }}" class="btn btn-primary">Faculty Login</a>
+        <a href="{{ url_for('student_login') }}" class="btn btn-secondary">Student Login</a>
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Register New Student</a>
+    </div>
+</div>
+
+<div class="features slide-in-up">
+    <h2>Why Choose Our System?</h2>
+    <div class="feature-grid">
+        <div class="feature-card hover-lift">
+            <div class="feature-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 5.5V7H9V5.5L3 7V9L9 10.5V12.5L3 14V16L9 17.5V22H15V17.5L21 16V14L15 12.5V10.5L21 9Z" fill="currentColor"/>
+                </svg>
+            </div>
+            <h3>AI Face Recognition</h3>
+            <p>Advanced neural networks accurately identify students with 99.8% precision using facial biometrics.</p>
+        </div>
+        <div class="feature-card hover-lift">
+            <div class="feature-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 6L18.29 8.29L13.41 13.17L9.41 9.17L2 16.59L3.41 18L9.41 12L13.41 16L19.71 9.71L22 12V6H16Z" fill="currentColor"/>
+                </svg>
+            </div>
+            <h3>Real-time Analytics</h3>
+            <p>Generate comprehensive attendance reports and track student progress with live data visualization.</p>
+        </div>
+        <div class="feature-card hover-lift">
+            <div class="feature-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM12 7C13.1 7 14 7.9 14 9C14 10.1 13.1 11 12 11C10.9 11 10 10.1 10 9C10 7.9 10.9 7 12 7ZM18 13.59C17.67 13.85 17.35 14.09 17 14.3V13C17 12.45 16.55 12 16 12H8C7.45 12 7 12.45 7 13V14.3C6.65 14.09 6.33 13.85 6 13.59V11H18V13.59Z" fill="currentColor"/>
+                </svg>
+            </div>
+            <h3>Enterprise Security</h3>
+            <p>Military-grade encryption and privacy protection ensuring your data remains secure and confidential.</p>
+        </div>
+        <div class="feature-card hover-lift">
+            <div class="feature-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 1.01L7 1C5.9 1 5 1.9 5 3V21C5 22.1 5.9 23 7 23H17C18.1 23 19 22.1 19 21V3C19 1.9 18.1 1.01 17 1.01ZM17 19H7V5H17V19ZM12 22C12.55 22 13 21.55 13 21C13 20.45 12.55 20 12 20C11.45 20 11 20.45 11 21C11 21.55 11.45 22 12 22Z" fill="currentColor"/>
+                </svg>
+            </div>
+            <h3>Intuitive Interface</h3>
+            <p>User-friendly design optimized for both faculty and students with seamless navigation experience.</p>
+        </div>
+    </div>
+</div>
+
+<div class="stats slide-in-up">
+    <h2>System Statistics</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" id="student-count">0</div>
+            <div class="stat-label">Registered Students</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="lecture-count">0</div>
+            <div class="stat-label">Active Lectures</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="attendance-count">0</div>
+            <div class="stat-label">Attendance Records</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="faculty-count">0</div>
+            <div class="stat-label">Faculty Members</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Animate statistics counting
+    function animateValue(id, start, end, duration) {
+        let obj = document.getElementById(id);
+        let range = end - start;
+        let current = start;
+        let increment = end > start ? 1 : -1;
+        let stepTime = Math.abs(Math.floor(duration / range));
+        let timer = setInterval(function() {
+            current += increment;
+            obj.innerHTML = current;
+            if (current == end) {
+                clearInterval(timer);
+            }
+        }, stepTime);
+    }
+
+    // Fetch statistics from server
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/get_statistics')
+            .then(response => response.json())
+            .then(data => {
+                animateValue('student-count', 0, data.students, 2000);
+                animateValue('lecture-count', 0, data.lectures, 2000);
+                animateValue('attendance-count', 0, data.attendance, 2000);
+                animateValue('faculty-count', 0, data.faculty, 2000);
+            });
+    });
+</script>
+{% endblock %}

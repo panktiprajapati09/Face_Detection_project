@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Manage Enrollment: {{ lecture.lecture_code }} - {{ lecture.title }}</h2>
+    
+    <div class="enrollment-stats">
+        <div class="stat">Total Enrolled: {{ enrolled_students|length }}</div>
+    </div>
+
+    <form method="POST">
+        <div class="form-group">
+            <label>Select Students:</label>
+            <div class="students-list" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+                {% for student in all_students %}
+                <div class="student-checkbox">
+                    <label>
+                        <input type="checkbox" name="student_ids" value="{{ student.id }}"
+                               {% if student.id in enrolled_ids %}checked{% endif %}>
+                        {{ student.name }} ({{ student.student_id }})
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" name="action" value="enroll" class="btn btn-success">
+                Enroll Selected
+            </button>
+            <button type="submit" name="action" value="remove" class="btn btn-danger">
+                Remove Selected
+            </button>
+            <a href="{{ url_for('faculty_dashboard') }}" class="btn btn-secondary">
+                Back to Dashboard
+            </a>
+        </div>
+    </form>
+
+    <div class="current-enrollment">
+        <h3>Currently Enrolled Students ({{ enrolled_students|length }})</h3>
+        {% if enrolled_students %}
+        <ul>
+            {% for student in enrolled_students %}
+            <li>{{ student.name }} ({{ student.student_id }})</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No students enrolled yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

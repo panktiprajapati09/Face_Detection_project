@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- 🌟 BEAUTIFUL MODERN CSS FOR REGISTERED STUDENTS PAGE -->
+<style>
+
+/* ----------------------------
+   GLOBAL CARD + LAYOUT
+----------------------------- */
+.card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    animation: fadeIn 0.5s ease;
+    margin-bottom: 20px;
+}
+
+.slide-in-up {
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ----------------------------
+   HEADER
+----------------------------- */
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.table-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* ----------------------------
+   BUTTONS
+----------------------------- */
+.btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.btn-primary {
+    background: #4e73df;
+    color: white;
+}
+.btn-primary:hover {
+    background: #3b5cc4;
+}
+
+/* Small Buttons */
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+/* Action Buttons */
+.btn-icon {
+    background: #e9ecef;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-right: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s;
+    border: none;
+}
+.btn-icon:hover {
+    background: #d6d8db;
+}
+
+.btn-danger {
+    background: #e74a3b !important;
+    color: white !important;
+}
+.btn-danger:hover {
+    background: #c23321 !important;
+}
+
+/* ----------------------------
+   SEARCH BOX
+----------------------------- */
+.search-box {
+    margin-bottom: 15px;
+}
+
+#search-input {
+    width: 100%;
+    max-width: 350px;
+    padding: 10px;
+    border: 1px solid #d1d3e2;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: 0.3s ease;
+}
+
+#search-input:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 4px rgba(78, 115, 223, 0.4);
+    outline: none;
+}
+
+/* ----------------------------
+   TABLE STYLING
+----------------------------- */
+.table-responsive {
+    margin-top: 10px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.data-table thead {
+    background: #4e73df;
+    color: white;
+}
+
+.data-table th {
+    padding: 12px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.data-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 14px;
+}
+
+.data-table tr:hover {
+    background: #f8f9fc;
+}
+
+.no-data {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* ----------------------------
+   FOOTER / PAGINATION
+----------------------------- */
+.table-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-info {
+    color: #555;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-number {
+    font-weight: 600;
+    color: #333;
+}
+
+</style>
+
+
+<div class="card slide-in-up">
+    <div class="table-header">
+        <h2>Registered Students</h2>
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Register New Student</a>
+    </div>
+    
+    <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search students..." class="form-input">
+    </div>
+    
+    <div class="table-responsive">
+        <table class="data-table" id="students-table">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Registration Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.student_id }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.created_at }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon" title="View Profile">👁️</button>
+                            <button class="btn-icon" title="Edit">✏️</button>
+                            <button class="btn-icon btn-danger" title="Delete">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="no-data">No students registered yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="table-footer">
+        <div class="table-info">
+            Showing {{ users|length }} students
+        </div>
+        <div class="pagination">
+            <button class="btn btn-sm" disabled>Previous</button>
+            <span class="page-number">Page 1 of 1</span>
+            <button class="btn btn-sm" disabled>Next</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        const table = document.getElementById('students-table');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        // Search functionality
+        searchInput.addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+                
+                for (let j = 0; j < cells.length - 1; j++) { // Skip actions column
+                    const cellText = cells[j].textContent.toLowerCase();
+                    if (cellText.includes(searchText)) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                rows[i].style.display = found ? '' : 'none';
+            }
+        });
+
+        // Action buttons functionality
+        initActionButtons();
+    });
+
+    function initActionButtons() {
+        // View Profile button
+        document.querySelectorAll('.btn-icon[title="View Profile"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const studentId = row.cells[0].textContent;
+                const studentName = row.cells[1].textContent;
+                alert(`View Profile: ${studentName} (${studentId})`);
+            });
+        });
+
+        // Edit button
+        document.querySelectorAll('.btn-icon[title="Edit"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const studentId = row.cells[0].textContent;
+                const studentName = row.cells[1].textContent;
+                const email = row.cells[2].textContent;
+                
+                const newName = prompt('Edit Student Name:', studentName);
+                const newEmail = prompt('Edit Email:', email);
+                
+                if (newName && newEmail) {
+                    updateStudent(studentId, newName, newEmail);
+                }
+            });
+        });
+
+        // Delete button
+        document.querySelectorAll('.btn-icon[title="Delete"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const studentId = row.cells[0].textContent;
+                const studentName = row.cells[1].textContent;
+                
+                if (confirm(`Are you sure you want to delete ${studentName} (${studentId})?`)) {
+                    deleteStudent(studentId, row);
+                }
+            });
+        });
+    }
+
+    // API functions
+    async function updateStudent(studentId, name, email) {
+        try {
+            const response = await fetch('/update_student', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    name: name,
+                    email: email
+                })
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                alert('Student updated successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + result.message);
+            }
+        } catch (error) {
+            alert('Error updating student: ' + error.message);
+        }
+    }
+
+    async function deleteStudent(studentId, row) {
+        try {
+            const response = await fetch('/delete_student', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_id: studentId
+                })
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                alert('Student deleted successfully!');
+                row.remove();
+            } else {
+                alert('Error: ' + result.message);
+            }
+        } catch (error) {
+            alert('Error deleting student: ' + error.message);
+        }
+    }
+</script>
+{% endblock %}

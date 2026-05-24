@@ -1,0 +1,675 @@
+<!-- sidebar.html -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <div class="logo-icon">👁️</div>
+            <span class="logo-text">FACEATTEND</span>
+        </div>
+        <button class="sidebar-close" id="sidebarClose">×</button>
+    </div>
+
+    <!-- Improved Search Box -->
+    <div class="search-box">
+        <div class="search-icon">🔍</div>
+        <input type="text" placeholder="Search..." class="search-input" id="searchInput">
+        <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <!-- === MAIN === -->
+        <div class="nav-section">
+            <h3 class="nav-section-title">MAIN</h3>
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="{{ url_for('index') }}" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-text">Home</span>
+                    </a>
+                </li>
+                
+                <!-- Conditional dashboards -->
+                {% if session.user_type == 'faculty' %}
+                <li class="nav-item">
+                    <a href="{{ url_for('faculty_dashboard') }}" class="nav-link">
+                        <span class="nav-icon">👨‍🏫</span>
+                        <span class="nav-text">Faculty Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('take_attendance') }}" class="nav-link">
+                        <span class="nav-icon">📷</span>
+                        <span class="nav-text">Take Attendance</span>
+                        <span class="nav-badge live">LIVE</span>
+                    </a>
+                </li>
+                {% elif session.user_type == 'student' %}
+                <li class="nav-item">
+                    <a href="{{ url_for('student_dashboard') }}" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">Student Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('progress_report') }}" class="nav-link">
+                        <span class="nav-icon">📈</span>
+                        <span class="nav-text">Progress Report</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- === ACCOUNT === -->
+        <div class="nav-section">
+            <h3 class="nav-section-title">ACCOUNT</h3>
+            <ul class="nav-links">
+                {% if session.user_type %}
+                <li class="nav-item">
+                    <a href="{{ url_for('logout') }}" class="nav-link">
+                        <span class="nav-icon">🚪</span>
+                        <span class="nav-text">Logout</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a href="{{ url_for('faculty_login') }}" class="nav-link">
+                        <span class="nav-icon">👨‍🏫</span>
+                        <span class="nav-text">Faculty Login</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('student_login') }}" class="nav-link">
+                        <span class="nav-icon">🎓</span>
+                        <span class="nav-text">Student Login</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('register') }}" class="nav-link">
+                        <span class="nav-icon">➕</span>
+                        <span class="nav-text">Register Student</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- === ADMIN PANEL === -->
+        <div class="nav-section">
+            <h3 class="nav-section-title">ADMIN PANEL</h3>
+            <ul class="nav-links">
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link admin-main-toggle">
+                        <span class="nav-icon">👨‍💼</span>
+                        <span class="nav-text">Admin Panel</span>
+                        <i class='bx bx-chevron-down submenu-arrow'></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="{{ url_for('admin_dashboard') }}" class="submenu-link">📊 Dashboard</a></li>
+                        <li><a href="{{ url_for('admin_users') }}" class="submenu-link">👥 User Management</a></li>
+                        <li><a href="{{ url_for('admin_detections') }}" class="submenu-link">🔍 Face Detections</a></li>
+                        <li><a href="{{ url_for('admin_access_logs') }}" class="submenu-link">📝 Access Logs</a></li>
+                        <li><a href="{{ url_for('manage_lectures') }}" class="submenu-link">📚 Lecture Management</a></li>
+                        <li><a href="{{ url_for('view_records') }}" class="submenu-link">📋 Attendance Records</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- === Footer === -->
+    <div class="sidebar-footer">
+        <div class="system-status">
+            <div class="status-indicator online"></div>
+            <span>System Online</span>
+        </div>
+        {% if session.user_type %}
+        <div class="user-role-badge">
+            <span class="role-badge {{ session.user_type }}">{{ session.user_type|title }}</span>
+        </div>
+        {% endif %}
+        <div class="current-time" id="sidebarTime"></div>
+    </div>
+</div>
+
+<!-- Overlay for mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Toggle button for sidebar -->
+<button id="sidebarToggle" class="sidebar-toggle">
+    <i class='bx bx-menu'></i>
+</button>
+
+<style>
+    /* Sidebar Styles */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 280px;
+        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+        color: white;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .logo-icon {
+        font-size: 24px;
+        background: linear-gradient(135deg, #4cc9f0, #4361ee);
+        border-radius: 8px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .logo-text {
+        font-weight: 700;
+        font-size: 18px;
+        background: linear-gradient(to right, #4cc9f0, #4361ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .sidebar-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.3s;
+    }
+    
+    .sidebar-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Search Box */
+    .search-box {
+        position: relative;
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 10px 15px 10px 40px;
+        border-radius: 8px;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.3);
+    }
+    
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .search-results {
+        position: absolute;
+        top: 100%;
+        left: 15px;
+        right: 15px;
+        background: rgba(30, 30, 46, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 8px;
+        margin-top: 5px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        display: none;
+        z-index: 1001;
+        overflow: hidden;
+    }
+    
+    .search-result-item {
+        padding: 12px 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: background 0.2s;
+    }
+    
+    .search-result-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .search-result-item.no-results {
+        color: rgba(255, 255, 255, 0.6);
+        cursor: default;
+    }
+    
+    .result-icon {
+        font-size: 16px;
+    }
+    
+    /* Navigation */
+    .sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px 0;
+    }
+    
+    .nav-section {
+        margin-bottom: 20px;
+    }
+    
+    .nav-section-title {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(255, 255, 255, 0.5);
+        padding: 0 20px 10px;
+        margin: 0;
+    }
+    
+    .nav-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .nav-item {
+        margin-bottom: 5px;
+    }
+    
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s;
+        position: relative;
+    }
+    
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+    
+    .nav-icon {
+        font-size: 18px;
+        width: 24px;
+        text-align: center;
+    }
+    
+    .nav-text {
+        flex: 1;
+        font-weight: 500;
+    }
+    
+    .nav-badge {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+    
+    .nav-badge.live {
+        background: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+    }
+    
+    /* Admin Submenu Styles */
+    .has-submenu {
+        position: relative;
+    }
+    
+    .submenu {
+        list-style: none;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        background: rgba(255, 255, 255, 0.05);
+        border-left: 3px solid #4cc9f0;
+        margin-left: 10px;
+        border-radius: 0 0 8px 8px;
+    }
+    
+    .submenu.active {
+        max-height: 500px;
+    }
+    
+    .submenu-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s;
+        border-left: 3px solid transparent;
+        font-size: 14px;
+    }
+    
+    .submenu-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-left-color: #4cc9f0;
+    }
+    
+    .submenu-arrow {
+        transition: transform 0.3s ease;
+        margin-left: auto;
+        font-size: 16px;
+    }
+    
+    .submenu-arrow.rotated {
+        transform: rotate(180deg);
+    }
+    
+    /* Sidebar Footer */
+    .sidebar-footer {
+        padding: 15px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.1);
+    }
+    
+    .system-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+    
+    .status-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+    
+    .status-indicator.online {
+        background: #4bb543;
+        box-shadow: 0 0 5px #4bb543;
+    }
+    
+    .user-role-badge {
+        margin: 10px 0;
+        text-align: center;
+    }
+    
+    .role-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .role-badge.faculty {
+        background: rgba(255, 204, 0, 0.2);
+        color: #ffcc00;
+    }
+    
+    .role-badge.student {
+        background: rgba(67, 97, 238, 0.2);
+        color: #4361ee;
+    }
+    
+    .role-badge.admin {
+        background: rgba(75, 181, 67, 0.2);
+        color: #4bb543;
+    }
+    
+    .current-time {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        text-align: center;
+    }
+    
+    /* Sidebar Toggle Button */
+    .sidebar-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: linear-gradient(135deg, #4cc9f0, #4361ee);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 999;
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        transition: all 0.3s;
+    }
+    
+    .sidebar-toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+    }
+    
+    .sidebar-toggle i {
+        font-size: 24px;
+    }
+    
+    /* Sidebar Overlay */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+    }
+    
+    .sidebar-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 260px;
+        }
+    }
+</style>
+
+<script>
+    // Initialize sidebar functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update sidebar time
+        function updateSidebarTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            const timeElement = document.getElementById('sidebarTime');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+        
+        // Update time immediately and set interval
+        updateSidebarTime();
+        setInterval(updateSidebarTime, 60000);
+        
+        // Search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            
+            if (!searchInput || !searchResults) return;
+            
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase().trim();
+                
+                if (query.length < 2) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+                
+                // Get all navigation links
+                const navLinks = document.querySelectorAll('.nav-link');
+                const matches = [];
+                
+                navLinks.forEach(link => {
+                    const textElement = link.querySelector('.nav-text');
+                    if (textElement) {
+                        const text = textElement.textContent.toLowerCase();
+                        if (text.includes(query)) {
+                            matches.push({
+                                text: textElement.textContent,
+                                href: link.href,
+                                icon: link.querySelector('.nav-icon').textContent
+                            });
+                        }
+                    }
+                });
+                
+                // Display results
+                if (matches.length > 0) {
+                    searchResults.innerHTML = matches.map(match => `
+                        <div class="search-result-item" onclick="window.location.href='${match.href}'">
+                            <span class="result-icon">${match.icon}</span>
+                            <span class="result-text">${match.text}</span>
+                        </div>
+                    `).join('');
+                    searchResults.style.display = 'block';
+                } else {
+                    searchResults.innerHTML = '<div class="search-result-item no-results">No results found</div>';
+                    searchResults.style.display = 'block';
+                }
+            });
+            
+            // Hide results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+        }
+        
+        // Admin submenu toggle
+        function setupAdminSubmenu() {
+            const adminToggle = document.querySelector('.admin-main-toggle');
+            if (adminToggle) {
+                adminToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const submenu = this.nextElementSibling;
+                    const arrow = this.querySelector('.submenu-arrow');
+                    
+                    // Close all other submenus
+                    document.querySelectorAll('.submenu').forEach(menu => {
+                        if (menu !== submenu) {
+                            menu.classList.remove('active');
+                        }
+                    });
+                    document.querySelectorAll('.submenu-arrow').forEach(icon => {
+                        if (icon !== arrow) icon.classList.remove('rotated');
+                    });
+
+                    // Toggle current submenu
+                    submenu.classList.toggle('active');
+                    arrow.classList.toggle('rotated');
+                });
+            }
+
+            // Prevent submenu from closing when clicking on its links
+            document.querySelectorAll('.submenu-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Allow navigation without collapsing submenu
+                });
+            });
+
+            // Close submenu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.has-submenu')) {
+                    document.querySelectorAll('.submenu').forEach(menu => {
+                        menu.classList.remove('active');
+                    });
+                    document.querySelectorAll('.submenu-arrow').forEach(arrow => {
+                        arrow.classList.remove('rotated');
+                    });
+                }
+            });
+        }
+        
+        // Sidebar toggle functionality
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+            });
+        }
+        
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
+        
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                this.classList.remove('active');
+            });
+        }
+        
+        // Initialize components
+        setupSearch();
+        setupAdminSubmenu();
+    });
+</script>

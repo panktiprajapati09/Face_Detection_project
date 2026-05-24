@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Attendance</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .status-card {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+        
+        .status-card.active {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+        
+        .status-card.error {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+        
+        .status-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .status-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .status-icon.active {
+            background: #10b981;
+            color: white;
+        }
+        
+        .status-icon.inactive {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .status-icon.error {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .status-title {
+            font-weight: 600;
+            font-size: 16px;
+            flex: 1;
+        }
+        
+        .status-details {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+        
+        .status-details strong {
+            color: #334155;
+            display: block;
+            margin-top: 3px;
+        }
+        
+        #video-container {
+            width: 100%;
+            height: 280px;
+            background: #1e293b;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        #face-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .face-box {
+            position: absolute;
+            border: 2px solid #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 8px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            color: white;
+        }
+        
+        .attendance-list {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 15px;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .attendance-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .attendance-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .attendance-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .attendance-name {
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .attendance-time {
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        .attendance-status {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .status-present {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            #video-container {
+                height: 250px;
+            }
+        }
+        
+        /* Scrollbar for attendance list */
+        .attendance-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .attendance-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .attendance-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-mobile-alt"></i> Mobile Attendance</h1>
+            <p>{{ faculty_name }} • {{ now.strftime('%H:%M') if now else '' }}</p>
+        </div>
+        
+        <div class="content">
+            <!-- Status Cards -->
+            <div id="location-status" class="status-card">
+                <div class="status-header">
+                    <div class="status-icon inactive"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="status-title">Location Status</div>
+                </div>
+                <div class="status-details" id="location-details">Getting location...</div>
+            </div>
+            
+            <div id="face-status" class="status-card">
+                <div class="status-header">
+                    <div class="status-icon inactive"><i class="fas fa-user"></i></div>
+                    <div class="status-title">Face Recognition</div>
+                </div>
+                <div class="status-details" id="face-details">Camera access required</div>
+            </div>
+            
+            <!-- Lecture Selection -->
+            <div class="status-card">
+                <div class="status-header">
+                    <div class="status-icon inactive"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div class="status-title">Select Lecture</div>
+                </div>
+                <div class="status-details">
+                    <select id="lecture-select" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px;">
+                        <option value="">Select a lecture</option>
+                        {% for lecture in lectures %}
+                        <option value="{{ lecture.id }}">{{ lecture.lecture_code }} - {{ lecture.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Video Container -->
+            <div id="video-container">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="face-overlay"></canvas>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls">
+                <button id="start-camera" class="btn btn-primary">
+                    <i class="fas fa-camera"></i> Start Camera
+                </button>
+                <button id="flip-camera" class="btn btn-warning" disabled>
+                    <i class="fas fa-sync-alt"></i> Flip
+                </button>
+            </div>
+            
+            <div id="attendance-section" style="display: none;">
+                <button id="mark-attendance" class="btn btn-success" style="width: 100%; margin-bottom: 15px;">
+                    <i class="fas fa-check-circle"></i> Mark Attendance
+                </button>
+                
+                <!-- Recent Attendance -->
+                <h4 style="margin-bottom: 10px; color: #334155;"><i class="fas fa-history"></i> Recent Attendance</h4>
+                <div class="attendance-list" id="recent-attendance">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Modal -->
+    <div class="loading" id="loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div id="loading-text">Processing...</div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // Global variables
+        let userLocation = null;
+        let recognizedFace = null;
+        let currentLectureId = null;
+        let videoStream = null;
+        let usingFrontCamera = true;
+        let recognitionInterval = null;
+        
+        // DOM Elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('face-overlay');
+        const ctx = canvas.getContext('2d');
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set canvas size
+            updateCanvasSize();
+            
+            // Get device info
+            getDeviceInfo();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Try to get location
+            getLocation();
+        });
+        
+        // 1. LOCATION FUNCTIONS
+        function getLocation() {
+            if (!navigator.geolocation) {
+                updateStatus('location', 'error', 'Geolocation not supported');
+                return;
+            }
+            
+            updateStatus('location', 'inactive', 'Requesting location...');
+            
+            navigator.geolocation.getCurrentPosition(
+                locationSuccess,
+                locationError,
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+        
+        function locationSuccess(position) {
+            userLocation = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy,
+                timestamp: new Date(position.timestamp)
+            };
+            
+            updateStatus('location', 'active', 
+                `📍 Location acquired<br>
+                 <strong>Accuracy:</strong> ±${userLocation.accuracy.toFixed(1)}m`
+            );
+            
+            // Verify against lecture location when lecture is selected
+            if (currentLectureId) {
+                verifyLectureLocation();
+            }
+        }
+        
+        function locationError(error) {
+            let message = 'Unknown error';
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    message = 'Location permission denied';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = 'Location unavailable';
+                    break;
+                case error.TIMEOUT:
+                    message = 'Location timeout';
+                    break;
+            }
+            
+            updateStatus('location', 'error', `❌ ${message}`);
+        }
+        
+        // 2. CAMERA FUNCTIONS
+        document.getElementById('start-camera').addEventListener('click', startCamera);
+        
+        function startCamera() {
+            showLoading('Starting camera...');
+            
+            const constraints = {
+                video: {
+                    facingMode: usingFrontCamera ? 'user' : 'environment',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            };
+            
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(function(stream) {
+                    if (videoStream) {
+                        videoStream.getTracks().forEach(track => track.stop());
+                    }
+                    
+                    videoStream = stream;
+                    video.srcObject = stream;
+                    
+                    video.onloadedmetadata = function() {
+                        updateCanvasSize();
+                        updateStatus('face', 'active', 'Camera ready. Looking for faces...');
+                        document.getElementById('flip-camera').disabled = false;
+                        hideLoading();
+                        
+                        // Start face recognition
+                        startFaceRecognition();
+                    };
+                })
+                .catch(function(err) {
+                    hideLoading();
+                    updateStatus('face', 'error', `Camera error: ${err.message}`);
+                });
+        }
+        
+        // Flip camera
+        document.getElementById('flip-camera').addEventListener('click', function() {
+            usingFrontCamera = !usingFrontCamera;
+            startCamera();
+        });
+        
+        // 3. FACE RECOGNITION
+        function startFaceRecognition() {
+            if (recognitionInterval) {
+                clearInterval(recognitionInterval);
+            }
+            
+            recognitionInterval = setInterval(recognizeFace, 2000);
+        }
+        
+        function recognizeFace() {
+            if (!currentLectureId || video.readyState !== video.HAVE_ENOUGH_DATA) {
+                return;
+            }
+            
+            // Capture frame
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = video.videoWidth;
+            tempCanvas.height = video.videoHeight;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(video, 0, 0);
+            
+            // Convert to blob
+            tempCanvas.toBlob(async (blob) => {
+                try {
+                    const formData = new FormData();
+                    formData.append('image', blob, 'frame.jpg');
+                    formData.append('lecture_id', currentLectureId);
+                    
+                    const response = await fetch('/recognize_faces', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data && data.length > 0) {
+                        const face = data[0];
+                        if (face.id && face.name && face.name !== "Unknown") {
+                            recognizedFace = face;
+                            
+                            // Draw face box
+                            drawFaceBox(face);
+                            
+                            // Update status
+                            updateStatus('face', 'active',
+                                `✅ Recognized: ${face.name}<br>
+                                 <strong>Confidence:</strong> ${(face.confidence * 100).toFixed(1)}%`
+                            );
+                            
+                            // Enable attendance button
+                            document.getElementById('mark-attendance').disabled = false;
+                            
+                        } else {
+                            recognizedFace = null;
+                            clearFaceBox();
+                            updateStatus('face', 'active', 'Looking for recognized faces...');
+                            document.getElementById('mark-attendance').disabled = true;
+                        }
+                    } else {
+                        recognizedFace = null;
+                        clearFaceBox();
+                        updateStatus('face', 'active', 'No faces detected');
+                        document.getElementById('mark-attendance').disabled = true;
+                    }
+                } catch (error) {
+                    console.error('Recognition error:', error);
+                }
+            }, 'image/jpeg', 0.8);
+        }
+        
+        function drawFaceBox(face) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const scaleX = canvas.width / video.videoWidth;
+            const scaleY = canvas.height / video.videoHeight;
+            
+            const x = face.x * scaleX;
+            const y = face.y * scaleY;
+            const width = face.width * scaleX;
+            const height = face.height * scaleY;
+            
+            // Draw box
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x, y, width, height);
+            
+            // Draw name background
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(x, y - 25, ctx.measureText(face.name).width + 20, 20);
+            
+            // Draw name
+            ctx.fillStyle = 'white';
+            ctx.font = '14px Arial';
+            ctx.fillText(face.name, x + 10, y - 10);
+        }
+        
+        function clearFaceBox() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // 4. ATTENDANCE MARKING
+        document.getElementById('mark-attendance').addEventListener('click', markAttendance);
+        
+        async function markAttendance() {
+            if (!recognizedFace || !recognizedFace.id || !currentLectureId) {
+                alert('Please wait for face recognition');
+                return;
+            }
+            
+            if (!userLocation) {
+                if (!confirm('Location not available. Continue without location verification?')) {
+                    return;
+                }
+            }
+            
+            showLoading('Marking attendance...');
+            
+            try {
+                const deviceInfo = {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    screen: `${screen.width}x${screen.height}`,
+                    isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                };
+                
+                const data = {
+                    student_id: recognizedFace.id,
+                    lecture_id: currentLectureId,
+                    student_name: recognizedFace.name,
+                    latitude: userLocation ? userLocation.latitude : null,
+                    longitude: userLocation ? userLocation.longitude : null,
+                    device_info: deviceInfo
+                };
+                
+                const response = await fetch('/api/mobile/mark_attendance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                hideLoading();
+                
+                if (result.success) {
+                    // Show success
+                    alert(`✅ ${result.message}\n📍 ${result.location_status}`);
+                    
+                    // Add to recent list
+                    addRecentAttendance(recognizedFace.name, new Date());
+                    
+                    // Reset for next student
+                    recognizedFace = null;
+                    clearFaceBox();
+                    document.getElementById('mark-attendance').disabled = true;
+                    
+                    updateStatus('face', 'active', 'Ready for next student...');
+                    
+                } else {
+                    alert(`❌ ${result.message}`);
+                }
+                
+            } catch (error) {
+                hideLoading();
+                alert('Network error. Please try again.');
+                console.error('Attendance error:', error);
+            }
+        }
+        
+        // 5. HELPER FUNCTIONS
+        function updateStatus(type, status, message) {
+            const card = document.getElementById(`${type}-status`);
+            const icon = card.querySelector('.status-icon');
+            const details = card.querySelector('.status-details');
+            
+            // Update classes
+            card.className = 'status-card';
+            if (status === 'active') card.classList.add('active');
+            if (status === 'error') card.classList.add('error');
+            
+            // Update icon
+            icon.className = `status-icon ${status}`;
+            
+            // Update message
+            details.innerHTML = message;
+        }
+        
+        function updateCanvasSize() {
+            canvas.width = video.clientWidth || 640;
+            canvas.height = video.clientHeight || 480;
+        }
+        
+        function getDeviceInfo() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            console.log(`📱 Device: ${isMobile ? 'Mobile' : 'Desktop'}, User Agent: ${navigator.userAgent}`);
+        }
+        
+        function setupEventListeners() {
+            // Lecture selection
+            document.getElementById('lecture-select').addEventListener('change', function() {
+                currentLectureId = this.value;
+                if (currentLectureId) {
+                    document.getElementById('attendance-section').style.display = 'block';
+                    verifyLectureLocation();
+                    loadRecentAttendance();
+                } else {
+                    document.getElementById('attendance-section').style.display = 'none';
+                }
+            });
+            
+            // Window resize
+            window.addEventListener('resize', updateCanvasSize);
+            
+            // Page unload cleanup
+            window.addEventListener('beforeunload', function() {
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                }
+                if (recognitionInterval) {
+                    clearInterval(recognitionInterval);
+                }
+            });
+        }
+        
+        function verifyLectureLocation() {
+            if (!userLocation || !currentLectureId) return;
+            
+            fetch('/api/mobile/verify_location', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    lecture_id: currentLectureId,
+                    latitude: userLocation.latitude,
+                    longitude: userLocation.longitude
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const status = data.restricted ? 
+                        `✅ ${data.message}` : 
+                        '📍 No location restriction';
+                    
+                    updateStatus('location', 'active', 
+                        `${status}<br>
+                         <strong>Address:</strong> ${data.address || 'Unknown'}`
+                    );
+                } else {
+                    updateStatus('location', 'error', `❌ ${data.message}`);
+                }
+            });
+        }
+        
+        function loadRecentAttendance() {
+            if (!currentLectureId) return;
+            
+            fetch(`/view_attendance/${currentLectureId}?date=${new Date().toISOString().split('T')[0]}`)
+                .then(response => response.text())
+                .then(html => {
+                    // Parse HTML to extract attendance data
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const rows = doc.querySelectorAll('table tbody tr');
+                    
+                    const container = document.getElementById('recent-attendance');
+                    container.innerHTML = '';
+                    
+                    rows.forEach((row, index) => {
+                        if (index >= 5) return; // Limit to 5
+                        
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length >= 3) {
+                            const name = cells[1].textContent.trim();
+                            const time = cells[2].textContent.trim().split(' ')[1]; // Get time only
+                            
+                            const div = document.createElement('div');
+                            div.className = 'attendance-item';
+                            div.innerHTML = `
+                                <div class="attendance-avatar">${name.charAt(0)}</div>
+                                <div class="attendance-info">
+                                    <div class="attendance-name">${name}</div>
+                                    <div class="attendance-time">${time}</div>
+                                </div>
+                                <div class="attendance-status status-present">Present</div>
+                            `;
+                            container.appendChild(div);
+                        }
+                    });
+                    
+                    if (rows.length === 0) {
+                        container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 20px;">No attendance marked yet</div>';
+                    }
+                });
+        }
+        
+        function addRecentAttendance(name, time) {
+            const container = document.getElementById('recent-attendance');
+            const div = document.createElement('div');
+            div.className = 'attendance-item';
+            div.innerHTML = `
+                <div class="attendance-avatar">${name.charAt(0)}</div>
+                <div class="attendance-info">
+                    <div class="attendance-name">${name}</div>
+                    <div class="attendance-time">${time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                </div>
+                <div class="attendance-status status-present">Present</div>
+            `;
+            
+            container.insertBefore(div, container.firstChild);
+            
+            // Limit to 5 items
+            if (container.children.length > 5) {
+                container.removeChild(container.lastChild);
+            }
+        }
+        
+        function showLoading(text) {
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading-text').textContent = text;
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

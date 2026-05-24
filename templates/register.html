@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+/* ---------- PAGE BACKGROUND ---------- */
+body {
+    background: #f5f7ff !important; 
+    font-family: "Poppins", sans-serif;
+}
+
+/* Center the card nicely */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh;
+    padding-top: 20px;
+}
+
+/* ---------- REGISTRATION CARD ---------- */
+.card {
+    width: 480px;
+    padding: 2.8rem 2.5rem;
+    background: #ffffff;
+    border-radius: 25px;
+    box-shadow: 
+        10px 10px 35px rgba(0,0,0,0.08),
+        -5px -5px 25px rgba(255,255,255,1);
+    animation: softFade 0.7s ease-out;
+    text-align: center;
+}
+
+@keyframes softFade {
+    from { opacity: 0; transform: translateY(35px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- HEADER LOGO & TITLE ---------- */
+.login-header {
+    text-align: center;
+    margin-bottom: 25px;
+    animation: fadeIn 0.8s ease;
+}
+
+.login-icon {
+    font-size: 50px;
+    color:#3a0ca3;
+    margin-bottom: 8px;
+}
+
+.login-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color:#3a0ca3;
+    text-transform: lowercase;
+}
+
+/* ---------- CARD TEXT ---------- */
+.card h2 {
+    font-size: 1.9rem;
+    color: #2c2c2c;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.card p {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 1.6rem;
+}
+
+/* ---------- FORM INPUTS ---------- */
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.form-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1.5px solid #e6e9ff;
+    background: #f0f4ff;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.2s;
+}
+
+.form-input:focus {
+    border-color: #3a0ca3;
+    background: #eef3ff;
+    box-shadow: 0 0 0 4px rgba(58,12,163,0.15);
+}
+
+/* ---------- BUTTON ---------- */
+.btn-primary {
+    width: 100%;
+    padding: 13px;
+    color: white;
+    background: linear-gradient(90deg, #3a0ca3, #7209b7);
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 14px rgba(58,12,163,0.4);
+}
+
+.btn-primary:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 18px rgba(58,12,163,0.55);
+}
+
+/* ---------- PHOTO PREVIEW ---------- */
+.photo-preview {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.photo-preview img {
+    max-width: 200px;
+    border-radius: 12px;
+    margin-top: 10px;
+    border: 2px solid #3a0ca3;
+}
+
+/* ---------- LINKS ---------- */
+.login-links {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.login-links a {
+    color: #3a0ca3;
+    margin: 0 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: 0.3s;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+</style>
+
+<div class="login-wrapper">
+    <div class="card">
+
+        <!-- LOGO + TITLE -->
+        <div class="login-header">
+            <i class="fas fa-user-graduate login-icon"></i>
+            <h1 class="login-title">face attendance</h1>
+        </div>
+
+        <h2>Register New Student</h2>
+        <p>Please fill in all details to register for the face recognition attendance system.</p>
+
+        <form action="{{ url_for('register') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
+            <div class="form-group">
+                <label class="form-label">Student ID</label>
+                <input type="text" name="student_id" class="form-input" placeholder="e.g., S1, S2" required autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="name" class="form-input" placeholder="Enter full name" required autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-input" placeholder="Enter email" required autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Upload Passport-style Photo</label>
+                <input type="file" name="photo" id="photo" accept="image/jpeg, image/png" class="form-input" required>
+                <small style="color:#555;">Upload a clear front-facing photo only. Other images will be rejected.</small>
+            </div>
+
+            <div class="photo-preview" id="photo-preview" style="display:none;">
+                <img id="preview-img" src="#" alt="Photo preview">
+            </div>
+
+            <button type="submit" class="btn-primary">Register</button>
+        </form>
+
+        <div class="login-links">
+            <a href="{{ url_for('index') }}">Return to Home</a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Preview photo before upload
+    const photoInput = document.getElementById('photo');
+    const preview = document.getElementById('photo-preview');
+    const img = document.getElementById('preview-img');
+
+    photoInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            // Only allow JPEG or PNG
+            const validTypes = ['image/jpeg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                alert('Only JPEG or PNG images allowed!');
+                this.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Camera Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        video { width: 640px; height: 480px; border: 2px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>Camera Test Page</h1>
+    <p>This is a simple test to see if your camera works.</p>
+    
+    <video id="video" autoplay playsinline></video>
+    <br>
+    <button id="start">Start Camera</button>
+    <button id="stop">Stop Camera</button>
+
+    <script>
+        console.log('Test page loaded');
+        
+        const video = document.getElementById('video');
+        const startBtn = document.getElementById('start');
+        const stopBtn = document.getElementById('stop');
+        
+        let stream = null;
+
+        startBtn.addEventListener('click', async function() {
+            console.log('Start button clicked in test');
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                console.log('Camera started successfully in test');
+                alert('Camera working!');
+            } catch (error) {
+                console.error('Camera error in test:', error);
+                alert('Camera error: ' + error.message);
+            }
+        });
+
+        stopBtn.addEventListener('click', function() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                video.srcObject = null;
+            }
+        });
+    </script>
+</body>
+</html>

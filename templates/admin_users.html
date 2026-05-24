@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - FACEATTEND</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Your existing CSS styles remain the same */
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --primary-light: #4895ef;
+            --secondary: #4cc9f0;
+            --success: #4bb543;
+            --warning: #ffcc00;
+            --danger: #dc3545;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-left h1 {
+            color: var(--primary-dark);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-left p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .refresh-btn {
+            background: var(--success);
+            color: white;
+        }
+
+        .refresh-btn:hover {
+            background: #3a9c35;
+            transform: translateY(-2px);
+        }
+
+        .user-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 35px 10px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--light-gray);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid #e9ecef;
+            font-size: 14px;
+        }
+
+        .table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f1f3f4;
+            font-size: 14px;
+        }
+
+        .table tr {
+            transition: var(--transition);
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(75, 181, 67, 0.1);
+            color: var(--success);
+        }
+
+        .status-inactive {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--gray);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-icon {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-view {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .btn-view:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-edit {
+            background: rgba(255, 193, 7, 0.1);
+            color: #e0a800;
+        }
+
+        .btn-edit:hover {
+            background: #e0a800;
+            color: white;
+        }
+
+        .btn-danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: var(--border-radius);
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--dark);
+            font-size: 20px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close:hover {
+            color: var(--dark);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stat-students {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .stat-faculty {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--secondary);
+        }
+
+        .stat-info h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--light-gray);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination-btn:hover:not(.active) {
+            background: var(--light-gray);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification-success {
+            background: var(--success);
+        }
+
+        .notification-error {
+            background: var(--danger);
+        }
+
+        .notification-warning {
+            background: var(--warning);
+            color: var(--dark);
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
+                width: 100%;
+                display: flex;
+                gap: 10px;
+            }
+            
+            .header-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+            }
+        }
+        /* Back to Dashboard Button Styles */
+.btn-secondary {
+    background: var(--primary); /* Primary blue */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background: #228ee1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(108, 117, 125, 0.2);
+}
+
+/* If you want a different color scheme for the back button specifically */
+.btn-back {
+    background: #6c757d; /* Gray */
+    color: white;
+}
+
+.btn-back:hover {
+    background: #5a6268; /* Darker gray */
+}
+
+/* Or if you want it to match your primary theme */
+.btn-back-primary {
+    background: var(--primary-light);
+    color: white;
+}
+
+.btn-back-primary:hover {
+    background: var(--primary);
+}
+
+/* For a subtle outline style */
+.btn-outline-back {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.btn-outline-back:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .btn-secondary {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+    
+    /* Make button full width on mobile if needed */
+    .btn-secondary.mobile-full {
+        width: 100%;
+        justify-content: center;
+    }
+}
+/* If you want the back button to have a distinct style */
+.back-dashboard-btn {
+    background: linear-gradient(135deg, #e188c9 0%, #6d9fc4 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: var(--transition);
+    box-shadow: 0 3px 10px rgba(108, 117, 125, 0.2);
+}
+
+.back-dashboard-btn:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+    color: white;
+}
+
+.back-dashboard-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(108, 117, 125, 0.2);
+}
+
+/* Icon animation for back button */
+.back-dashboard-btn i {
+    transition: transform 0.3s ease;
+}
+
+.back-dashboard-btn:hover i {
+    transform: translateX(-3px);
+}
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <div class="header-left">
+                <h1><i class="fas fa-users"></i> User Management</h1>
+                <p>Manage students and faculty members</p>
+            </div>
+            <div class="header-actions">
+                <a href="/admin_dashboard" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+    
+                <button class="btn btn-primary" onclick="showAddUserModal()">
+                    <i class="fas fa-user-plus"></i> Add User
+                </button>
+                <button class="btn refresh-btn" onclick="loadUsers()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon stat-students">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="students-count">0</h3>
+                    <p>Total Students</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-faculty">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="faculty-count">0</h3>
+                    <p>Total Faculty</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Type Tabs -->
+        <div class="user-tabs">
+            <button class="tab-btn active" onclick="switchTab('students')">
+                <i class="fas fa-user-graduate"></i> Students
+            </button>
+            <button class="tab-btn" onclick="switchTab('faculty')">
+                <i class="fas fa-chalkboard-teacher"></i> Faculty
+            </button>
+        </div>
+
+        <!-- Students Section -->
+        <div id="students-tab" class="tab-content active">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-user-graduate"></i> Student Management</h2>
+                    <div class="search-box">
+                        <input type="text" id="student-search" placeholder="Search students..." onkeyup="searchStudents()">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="table" id="students-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Registered</th>
+                                <th>Enrolled Lectures</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-tbody">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="students-pagination">
+                    <!-- Pagination buttons -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Faculty Section -->
+        <div id="faculty-tab" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-chalkboard-teacher"></i> Faculty Management</h2>
+                    <div class="search-box">
+                        <input type="text" id="faculty-search" placeholder="Search faculty..." onkeyup="searchFaculty()">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="table" id="faculty-table">
+                        <thead>
+                            <tr>
+                                <th>Faculty ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Registered</th>
+                                <th>Assigned Lectures</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="faculty-tbody">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="faculty-pagination">
+                    <!-- Pagination buttons -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit User Modal -->
+    <div class="modal" id="add-user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="add-user-title">Add New User</h3>
+                <span class="close" onclick="closeAddUserModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="add-user-form">
+                    <input type="hidden" id="edit-user-id" name="edit_user_id">
+                    <input type="hidden" id="edit-user-type" name="edit_user_type">
+                    
+                    <div class="form-group">
+                        <label>User Type</label>
+                        <select id="user-type" name="user_type" class="form-input" required onchange="togglePasswordField()">
+                            <option value="student">Student</option>
+                            <option value="faculty">Faculty</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label id="id-label">Student ID</label>
+                        <input type="text" id="user-id" name="user_id" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="user-name" name="name" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="user-email" name="email" class="form-input" required>
+                    </div>
+                    
+                    <div id="faculty-password-field" style="display: none;">
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="user-password" name="password" class="form-input" placeholder="Enter password for faculty" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="photo-field">
+                        <label>Photo Path</label>
+                        <input type="text" id="user-photo" name="photo_path" class="form-input" placeholder="path/to/photo.jpg">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeAddUserModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="submit-user-btn">Add User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div class="modal" id="user-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="user-detail-title">User Details</h3>
+                <span class="close" onclick="closeUserDetailModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="user-detail-body">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'students';
+        let currentStudentsPage = 1;
+        let currentFacultyPage = 1;
+        const itemsPerPage = 5;
+
+        // Function to toggle password field based on user type
+        function togglePasswordField() {
+            const isFaculty = document.getElementById('user-type').value === 'faculty';
+            const isEdit = !!document.getElementById('edit-user-id').value;
+            
+            document.getElementById('id-label').textContent = isFaculty ? 'Faculty ID' : 'Student ID';
+            document.getElementById('faculty-password-field').style.display = isFaculty ? 'block' : 'none';
+            document.getElementById('photo-field').style.display = isFaculty ? 'none' : 'block';
+            
+            // Make password required for new faculty members only
+            const passwordField = document.getElementById('user-password');
+            if (isFaculty && !isEdit) {
+                passwordField.required = true;
+                passwordField.placeholder = 'Enter password for faculty';
+            } else {
+                passwordField.required = false;
+                passwordField.placeholder = 'Leave blank to keep current password';
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`.tab-btn:nth-child(${tab === 'students' ? 1 : 2})`).classList.add('active');
+            document.getElementById(`${tab}-tab`).classList.add('active');
+            
+            if (tab === 'students') loadStudents();
+            else loadFaculty();
+        }
+
+        async function loadUsers() {
+            await loadStudents();
+            await loadFaculty();
+            updateStats();
+        }
+
+        async function updateStats() {
+            try {
+                // Fetch student count
+                const studentResponse = await fetch('/admin_api/get_all_students');
+                const studentData = await studentResponse.json();
+                const studentCount = studentData.success ? studentData.students.length : 0;
+                document.getElementById('students-count').textContent = studentCount;
+                
+                // Fetch faculty count
+                const facultyResponse = await fetch('/admin_api/get_all_faculty');
+                const facultyData = await facultyResponse.json();
+                const facultyCount = facultyData.success ? facultyData.faculty.length : 0;
+                document.getElementById('faculty-count').textContent = facultyCount;
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        async function loadStudents() {
+            try {
+                showLoading('students-tbody');
+                const response = await fetch('/admin_api/get_all_students');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayStudents(data.students);
+                } else {
+                    showNotification(data.error || 'Error loading students', 'error');
+                    document.getElementById('students-tbody').innerHTML = '<tr><td colspan="6" class="no-data">Error loading students</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+                showNotification('Error loading students', 'error');
+                document.getElementById('students-tbody').innerHTML = '<tr><td colspan="6" class="no-data">Error loading students</td></tr>';
+            }
+        }
+
+        function displayStudents(students) {
+            const tbody = document.getElementById('students-tbody');
+            tbody.innerHTML = '';
+            
+            if (students && students.length > 0) {
+                const startIndex = (currentStudentsPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const studentsToShow = students.slice(startIndex, endIndex);
+                
+                studentsToShow.forEach(student => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${student.student_id}</strong></td>
+                        <td>${student.name}</td>
+                        <td>${student.email}</td>
+                        <td>${new Date(student.created_at).toLocaleDateString()}</td>
+                        <td>${student.enrolled_lectures || 0}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-view" onclick="viewUser(${student.id}, 'student')" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon btn-edit" onclick="editUser(${student.id}, 'student')" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-danger" onclick="deleteUser(${student.id}, 'student')" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                setupPagination('students-pagination', students.length, currentStudentsPage, 'students');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">No students found</td></tr>';
+            }
+        }
+
+        async function loadFaculty() {
+            try {
+                showLoading('faculty-tbody');
+                const response = await fetch('/admin_api/get_all_faculty');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayFaculty(data.faculty);
+                } else {
+                    showNotification(data.error || 'Error loading faculty', 'error');
+                    document.getElementById('faculty-tbody').innerHTML = '<tr><td colspan="6" class="no-data">Error loading faculty</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading faculty:', error);
+                showNotification('Error loading faculty', 'error');
+                document.getElementById('faculty-tbody').innerHTML = '<tr><td colspan="6" class="no-data">Error loading faculty</td></tr>';
+            }
+        }
+
+        function displayFaculty(faculty) {
+            const tbody = document.getElementById('faculty-tbody');
+            tbody.innerHTML = '';
+            
+            if (faculty && faculty.length > 0) {
+                const startIndex = (currentFacultyPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const facultyToShow = faculty.slice(startIndex, endIndex);
+                
+                facultyToShow.forEach(facultyMember => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${facultyMember.faculty_id}</strong></td>
+                        <td>${facultyMember.name}</td>
+                        <td>${facultyMember.email}</td>
+                        <td>${new Date(facultyMember.created_at).toLocaleDateString()}</td>
+                        <td>${facultyMember.assigned_lectures || 0}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-view" onclick="viewUser(${facultyMember.id}, 'faculty')" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon btn-edit" onclick="editUser(${facultyMember.id}, 'faculty')" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-danger" onclick="deleteUser(${facultyMember.id}, 'faculty')" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                setupPagination('faculty-pagination', faculty.length, currentFacultyPage, 'faculty');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">No faculty members found</td></tr>';
+            }
+        }
+
+        function setupPagination(containerId, totalItems, currentPage, type) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'pagination-btn';
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => changePage(currentPage - 1, type);
+            container.appendChild(prevBtn);
+            
+            // Page buttons
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => changePage(i, type);
+                container.appendChild(pageBtn);
+            }
+            
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'pagination-btn';
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = () => changePage(currentPage + 1, type);
+            container.appendChild(nextBtn);
+        }
+
+        function changePage(page, type) {
+            if (type === 'students') {
+                currentStudentsPage = page;
+                loadStudents();
+            } else {
+                currentFacultyPage = page;
+                loadFaculty();
+            }
+        }
+
+        function showLoading(tbodyId) {
+            const tbody = document.getElementById(tbodyId);
+            tbody.innerHTML = '<tr><td colspan="6" class="no-data">Loading...</td></tr>';
+        }
+
+        function showAddUserModal() {
+            document.getElementById('add-user-modal').style.display = 'block';
+            document.getElementById('add-user-title').textContent = 'Add New User';
+            document.getElementById('submit-user-btn').textContent = 'Add User';
+            document.getElementById('edit-user-id').value = '';
+            document.getElementById('edit-user-type').value = '';
+            document.getElementById('user-type').disabled = false;
+            document.getElementById('add-user-form').reset();
+            togglePasswordField();
+        }
+
+        function closeAddUserModal() {
+            document.getElementById('add-user-modal').style.display = 'none';
+        }
+
+        function showUserDetailModal() {
+            document.getElementById('user-detail-modal').style.display = 'block';
+        }
+
+        function closeUserDetailModal() {
+            document.getElementById('user-detail-modal').style.display = 'none';
+        }
+
+        // Handle form submission
+        document.getElementById('add-user-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const userData = Object.fromEntries(formData);
+            const isEdit = !!userData.edit_user_id;
+            const isFaculty = userData.user_type === 'faculty';
+            
+            // Validate data
+            if (!userData.user_id || !userData.name || !userData.email) {
+                showNotification('Please fill all required fields', 'error');
+                return;
+            }
+            
+            // For new faculty members, password is required
+            if (isFaculty && !isEdit && !userData.password) {
+                showNotification('Password is required for new faculty members', 'error');
+                return;
+            }
+            
+            try {
+                let response;
+                let endpoint;
+                
+                if (isEdit) {
+                    // Update existing user
+                    endpoint = '/admin_api/update_user';
+                } else {
+                    // Create new user
+                    endpoint = '/admin_api/create_new_user';
+                }
+                
+                console.log('Sending data to:', endpoint, userData);
+                
+                response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const result = await response.json();
+                console.log('Response from server:', result);
+                
+                if (result.success) {
+                    closeAddUserModal();
+                    loadUsers();
+                    showNotification(isEdit ? 'User updated successfully' : 'User added successfully', 'success');
+                } else {
+                    showNotification(result.error || (isEdit ? 'Error updating user' : 'Error adding user'), 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                showNotification(isEdit ? 'Error updating user' : 'Error adding user: ' + error.message, 'error');
+            }
+        });
+
+        async function viewUser(userId, userType) {
+            try {
+                const response = await fetch(`/admin_api/get_${userType}/${userId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const user = userType === 'student' ? data.student : data.faculty;
+                    document.getElementById('user-detail-title').textContent = `${userType === 'student' ? 'Student' : 'Faculty'} Details`;
+                    
+                    const detailBody = document.getElementById('user-detail-body');
+                    detailBody.innerHTML = `
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div style="display: flex; gap: 15px; align-items: center;">
+                                <div style="width: 80px; height: 80px; border-radius: 50%; background: ${userType === 'student' ? 'var(--primary)' : 'var(--secondary)'}; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h3 style="margin-bottom: 5px;">${user.name}</h3>
+                                    <p style="color: var(--gray);">${userType === 'student' ? user.student_id : user.faculty_id}</p>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <p style="font-weight: 500; margin-bottom: 5px;">Email</p>
+                                    <p>${user.email}</p>
+                                </div>
+                                <div>
+                                    <p style="font-weight: 500; margin-bottom: 5px;">Registered</p>
+                                    <p>${new Date(user.created_at).toLocaleDateString()}</p>
+                                </div>
+                                <div>
+                                    <p style="font-weight: 500; margin-bottom: 5px;">${userType === 'student' ? 'Enrolled Lectures' : 'Assigned Lectures'}</p>
+                                    <p>${userType === 'student' ? (user.enrolled_lectures || 0) : (user.assigned_lectures || 0)}</p>
+                                </div>
+                                ${userType === 'student' ? `
+                                <div>
+                                    <p style="font-weight: 500; margin-bottom: 5px;">Photo Path</p>
+                                    <p>${user.photo_path || 'Not specified'}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                    
+                    showUserDetailModal();
+                } else {
+                    showNotification(data.error || 'Error loading user details', 'error');
+                }
+            } catch (error) {
+                showNotification('Error loading user details', 'error');
+            }
+        }
+
+        async function editUser(userId, userType) {
+            try {
+                const response = await fetch(`/admin_api/get_${userType}/${userId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const user = userType === 'student' ? data.student : data.faculty;
+                    
+                    // Populate form with user data
+                    document.getElementById('add-user-title').textContent = `Edit ${userType === 'student' ? 'Student' : 'Faculty'}`;
+                    document.getElementById('submit-user-btn').textContent = 'Update User';
+                    document.getElementById('edit-user-id').value = userId;
+                    document.getElementById('edit-user-type').value = userType;
+                    document.getElementById('user-type').value = userType;
+                    document.getElementById('user-type').disabled = true; // Can't change user type when editing
+                    document.getElementById('user-id').value = userType === 'student' ? user.student_id : user.faculty_id;
+                    document.getElementById('user-name').value = user.name;
+                    document.getElementById('user-email').value = user.email;
+                    
+                    if (userType === 'student') {
+                        document.getElementById('user-photo').value = user.photo_path || '';
+                    }
+                    
+                    // For faculty, don't pre-fill password for security
+                    if (userType === 'faculty') {
+                        document.getElementById('user-password').value = '';
+                        document.getElementById('user-password').placeholder = 'Leave blank to keep current password';
+                    }
+                    
+                    togglePasswordField();
+                    document.getElementById('add-user-modal').style.display = 'block';
+
+                } else {
+                    showNotification(data.error || 'Error loading user data', 'error');
+                }
+            } catch (error) {
+                showNotification('Error loading user data', 'error');
+            }
+        }
+
+        async function deleteUser(userId, userType) {
+            if (confirm(`Are you sure you want to delete this ${userType}? This action cannot be undone.`)) {
+                try {
+                    const response = await fetch(`/admin_api/remove_user_account/${userType}/${userId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        loadUsers();
+                        showNotification(`${userType.charAt(0).toUpperCase() + userType.slice(1)} deleted successfully`, 'success');
+                    } else {
+                        showNotification(result.error || 'Error deleting user', 'error');
+                    }
+                } catch (error) {
+                    showNotification('Error deleting user', 'error');
+                }
+            }
+        }
+
+        function searchStudents() {
+            const searchTerm = document.getElementById('student-search').value.toLowerCase();
+            const rows = document.querySelectorAll('#students-tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        function searchFaculty() {
+            const searchTerm = document.getElementById('faculty-search').value.toLowerCase();
+            const rows = document.querySelectorAll('#faculty-tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'exclamation-triangle'}"></i>
+                ${message}
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+        });
+    </script>
+</body>
+</html>

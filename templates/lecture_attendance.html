@@ -1,0 +1,524 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+/* Attendance Container */
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    margin: 2rem auto;
+    max-width: 1200px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Header */
+.card h2 {
+    color: #2d3748;
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.card > p {
+    color: #718096;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+/* Action Buttons */
+.attendance-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+/* Summary Section */
+.attendance-summary {
+    margin-bottom: 3rem;
+}
+
+.attendance-summary h3 {
+    color: #2d3748;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.attendance-summary h3::before {
+    content: "📊";
+    font-size: 1.3rem;
+}
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card:nth-child(1) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.summary-card:nth-child(2) {
+    background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+    color: white;
+}
+
+.summary-card:nth-child(3) {
+    background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+    color: white;
+}
+
+.summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.summary-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.summary-label {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+/* Table Section */
+.attendance-table h3 {
+    color: #2d3748;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.attendance-table h3::before {
+    content: "📋";
+    font-size: 1.3rem;
+}
+
+/* Compact Table Container with Scrollable Body */
+.table-container {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    max-height: 400px; /* Smaller height for the table */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Compact Table Styles */
+.attendance-list {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.9rem; /* Smaller font size */
+}
+
+.attendance-list thead {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.attendance-list th {
+    padding: 0.75rem 1rem; /* Smaller padding */
+    text-align: left;
+    font-weight: 600;
+    color: #2d3748;
+    border-bottom: 2px solid #dee2e6;
+    font-size: 0.85rem; /* Smaller header font */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* Scrollable Table Body */
+.table-body-wrapper {
+    overflow-y: auto;
+    max-height: 300px; /* Adjust this to control scrollable area height */
+    flex: 1;
+}
+
+.attendance-list tbody tr {
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.attendance-list tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.attendance-list td {
+    padding: 0.75rem 1rem; /* Smaller padding */
+    border-bottom: 1px solid #e9ecef;
+    color: #4a5568;
+    font-size: 0.9rem; /* Smaller body font */
+    white-space: nowrap;
+}
+
+.attendance-list tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Status Badges */
+.status-present, .status-absent {
+    padding: 0.35rem 0.75rem; /* Smaller padding */
+    border-radius: 15px; /* Smaller radius */
+    font-size: 0.8rem; /* Smaller font */
+    font-weight: 600;
+    display: inline-block;
+    text-align: center;
+    min-width: 70px; /* Smaller min-width */
+}
+
+.status-present {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-absent {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* No Records Message */
+.attendance-list tbody tr td[colspan="4"] {
+    text-align: center;
+    padding: 2rem;
+    color: #718096;
+    font-style: italic;
+}
+
+/* Scrollbar Styling */
+.table-body-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-body-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-body-wrapper::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.table-body-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Animation */
+.slide-in-up {
+    animation: slideInUp 0.6s ease;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+    
+    .card h2 {
+        font-size: 1.8rem;
+    }
+    
+    .attendance-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-container {
+        max-height: 350px;
+    }
+    
+    .table-body-wrapper {
+        max-height: 250px;
+    }
+    
+    .attendance-list th,
+    .attendance-list td {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.85rem;
+    }
+    
+    .status-present, .status-absent {
+        padding: 0.25rem 0.6rem;
+        font-size: 0.75rem;
+        min-width: 60px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .attendance-actions {
+        display: none;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    .table-container {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        max-height: none;
+    }
+    
+    .table-body-wrapper {
+        max-height: none;
+        overflow: visible;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card slide-in-up">
+    <h2>Attendance for {{ lecture_code }} - {{ lecture_title }}</h2>
+    <p>View and manage attendance records for this lecture.</p>
+    
+    <div class="attendance-actions">
+        <a href="{{ url_for('take_attendance') }}" class="btn btn-primary">Take Attendance</a>
+        <button class="btn btn-secondary" onclick="exportToCSV()">Export to CSV</button>
+    </div>
+    
+    <div class="attendance-summary">
+        <h3>Attendance Summary</h3>
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-number">{{ records|length }}</div>
+                <div class="summary-label">Total Records</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number">{{ records|selectattr('status', 'equalto', 'Present')|list|length }}</div>
+                <div class="summary-label">Present</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number">{{ records|selectattr('status', 'equalto', 'Absent')|list|length }}</div>
+                <div class="summary-label">Absent</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="attendance-table">
+        <h3>Attendance Records</h3>
+        <div class="table-container">
+            <table class="attendance-list">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="table-body-wrapper">
+                <table class="attendance-list">
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ record.student_id }}</td>
+                            <td>{{ record.name }}</td>
+                            <td>{{ record.attendance_time }}</td>
+                            <td>
+                                <span class="status-{{ record.status|lower }}">{{ record.status }}</span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align: center;">No attendance records found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function exportToCSV() {
+        // Convert table to CSV
+        const table = document.querySelector('.attendance-list');
+        let csv = [];
+        
+        // Headers
+        const headers = [];
+        table.querySelectorAll('thead th').forEach(header => {
+            headers.push(header.textContent);
+        });
+        csv.push(headers.join(','));
+        
+        // Rows
+        table.querySelectorAll('tbody tr').forEach(row => {
+            const rowData = [];
+            row.querySelectorAll('td').forEach(cell => {
+                let text = cell.textContent;
+                if (cell.querySelector('.status-present') || cell.querySelector('.status-absent')) {
+                    text = cell.querySelector('span').textContent;
+                }
+                rowData.push(`"${text}"`);
+            });
+            csv.push(rowData.join(','));
+        });
+        
+        // Download CSV
+        const csvContent = "data:text/csv;charset=utf-8," + csv.join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "attendance_{{ lecture_code }}_{{ now }}.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Show notification (optional)
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: slideInRight 0.3s ease;
+            z-index: 1000;
+        `;
+        notification.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>✓</span>
+                <span>CSV exported successfully!</span>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+    
+    // Add CSS for notification animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}
